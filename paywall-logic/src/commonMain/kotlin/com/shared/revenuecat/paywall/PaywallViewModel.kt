@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
 
 /**
@@ -91,6 +92,6 @@ class PaywallViewModel(
     fun clearPurchaseSuccess() { _state.update { it.copy(purchaseSuccess = false) } }
 
     fun clear() {
-        scope.coroutineContext[SupervisorJob.Key]?.cancel()
+        scope.coroutineContext.cancelChildren()
     }
 }

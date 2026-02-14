@@ -1,4 +1,5 @@
 plugins {
+    alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.multiplatform)
     id("maven-publish")
 }
@@ -11,11 +12,6 @@ version = versionName
 
 kotlin {
     androidTarget {
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = "17"
-            }
-        }
         publishLibraryVariants("release")
     }
 
@@ -38,11 +34,25 @@ kotlin {
     }
 }
 
+android {
+    namespace = "com.shared.revenuecat.paywall.logic"
+    compileSdk = 35
+
+    defaultConfig {
+        minSdk = 24
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+}
+
 publishing {
     repositories {
         maven {
             name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/${System.getenv("GITHUB_REPOSITORY") ?: "yourname/revenuecat-shared"}")
+            url = uri("https://maven.pkg.github.com/${System.getenv("GITHUB_REPOSITORY") ?: "kwmt/revenuecat-shared"}")
             credentials {
                 username = System.getenv("GITHUB_ACTOR") ?: ""
                 password = System.getenv("GITHUB_TOKEN") ?: ""

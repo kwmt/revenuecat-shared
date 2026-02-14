@@ -22,7 +22,7 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven {
-            url = uri("https://maven.pkg.github.com/yourname/revenuecat-shared")
+            url = uri("https://maven.pkg.github.com/kwmt/revenuecat-shared")
             credentials {
                 username = providers.gradleProperty("gpr.user").orElse("").get()
                 password = providers.gradleProperty("gpr.token").orElse("").get()
