@@ -1,4 +1,5 @@
 plugins {
+    alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.compose.compiler)
@@ -13,11 +14,6 @@ version = versionName
 
 kotlin {
     androidTarget {
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = "17"
-            }
-        }
         publishLibraryVariants("release")
     }
 
@@ -39,6 +35,20 @@ kotlin {
             implementation(compose.foundation)
             implementation(compose.material3)
         }
+    }
+}
+
+android {
+    namespace = "com.shared.revenuecat.paywall.ui"
+    compileSdk = 35
+
+    defaultConfig {
+        minSdk = 24
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 }
 

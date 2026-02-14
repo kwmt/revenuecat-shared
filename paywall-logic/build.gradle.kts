@@ -1,4 +1,5 @@
 plugins {
+    alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.multiplatform)
     id("maven-publish")
 }
@@ -11,11 +12,6 @@ version = versionName
 
 kotlin {
     androidTarget {
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = "17"
-            }
-        }
         publishLibraryVariants("release")
     }
 
@@ -35,6 +31,20 @@ kotlin {
             api(project(":core"))
             implementation(libs.kotlinx.coroutines.core)
         }
+    }
+}
+
+android {
+    namespace = "com.shared.revenuecat.paywall.logic"
+    compileSdk = 35
+
+    defaultConfig {
+        minSdk = 24
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 }
 

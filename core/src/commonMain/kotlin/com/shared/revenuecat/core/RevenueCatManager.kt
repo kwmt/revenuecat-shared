@@ -3,6 +3,8 @@ package com.shared.revenuecat.core
 import com.revenuecat.purchases.kmp.Purchases
 import com.revenuecat.purchases.kmp.PurchasesConfiguration
 import com.revenuecat.purchases.kmp.ktx.awaitCustomerInfo
+import com.revenuecat.purchases.kmp.ktx.awaitLogIn
+import com.revenuecat.purchases.kmp.ktx.awaitLogOut
 import com.revenuecat.purchases.kmp.ktx.awaitOfferings
 import com.revenuecat.purchases.kmp.ktx.awaitPurchase
 import com.revenuecat.purchases.kmp.ktx.awaitRestore
@@ -81,7 +83,7 @@ object RevenueCatManager {
                 availablePackages = offering.availablePackages.map { pkg ->
                     PackageInfo(
                         identifier = pkg.identifier,
-                        localizedPriceString = pkg.storeProduct.localizedPriceString,
+                        localizedPriceString = pkg.storeProduct.price.formatted,
                         productIdentifier = pkg.storeProduct.id,
                         rcPackage = pkg,
                     )
@@ -96,7 +98,7 @@ object RevenueCatManager {
         return current.availablePackages.map { pkg ->
             PackageInfo(
                 identifier = pkg.identifier,
-                localizedPriceString = pkg.storeProduct.localizedPriceString,
+                localizedPriceString = pkg.storeProduct.price.formatted,
                 productIdentifier = pkg.storeProduct.id,
                 rcPackage = pkg,
             )
@@ -110,8 +112,8 @@ object RevenueCatManager {
     suspend fun purchase(purchaseParams: Any, packageInfo: PackageInfo): PurchaseResult {
         val pkg = packageInfo.rcPackage as com.revenuecat.purchases.kmp.models.Package
         return try {
-            val (_, customerInfo) = Purchases.sharedInstance.awaitPurchase(pkg)
-            val isActive = customerInfo
+            val result = Purchases.sharedInstance.awaitPurchase(pkg)
+            val isActive = result.customerInfo
                 .entitlements[requireConfig().entitlementId]
                 ?.isActive == true
             _entitlementStatus.value = EntitlementStatus(isActive = isActive)
@@ -150,12 +152,12 @@ object RevenueCatManager {
     // -------------------------------------------------------
 
     suspend fun login(appUserId: String) {
-        Purchases.sharedInstance.logIn(appUserId)
+        Purchases.sharedInstance.awaitLogIn(appUserId)
         checkEntitlement()
     }
 
     suspend fun logout() {
-        Purchases.sharedInstance.logOut()
+        Purchases.sharedInstance.awaitLogOut()
         _entitlementStatus.value = EntitlementStatus(isActive = false)
     }
 

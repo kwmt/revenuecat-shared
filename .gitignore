@@ -3,3 +3,6 @@ build/
 .idea/
 *.iml
 local.properties
+
+# Gradle Wrapper jar is intentionally tracked
+!gradle/wrapper/gradle-wrapper.jar
