@@ -23,6 +23,11 @@ class PaywallViewModel(
     private val manager: RevenueCatManager = RevenueCatManager,
     private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main),
 ) {
+    /** iOS (Swift) 向けファクトリ。Kotlin/Native はデフォルト引数をエクスポートしないため。 */
+    companion object {
+        fun create(): PaywallViewModel = PaywallViewModel()
+    }
+
     private val _state = MutableStateFlow(PaywallState())
     val state: StateFlow<PaywallState> = _state.asStateFlow()
 

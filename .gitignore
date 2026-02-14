@@ -6,3 +6,18 @@ local.properties
 
 # Gradle Wrapper jar is intentionally tracked
 !gradle/wrapper/gradle-wrapper.jar
+
+# iOS
+*.xcuserdata/
+xcuserdata/
+DerivedData/
+*.xcworkspace/xcshareddata/swiftpm/
+Pods/
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+*.moved-aside
+
+# iOS example - API key config
+example-ios/ExampleApp/Config.xcconfig
