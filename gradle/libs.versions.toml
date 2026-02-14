@@ -5,14 +5,22 @@ revenuecat = "2.5.1+17.33.1"
 revenuecat-ui = "2.5.1+17.33.1"
 coroutines = "1.9.0"
 compose-multiplatform = "1.7.3"
+activity-compose = "1.9.3"
+navigation-compose = "2.8.5"
+lifecycle = "2.8.7"
 
 [libraries]
 revenuecat-core = { module = "com.revenuecat.purchases:purchases-kmp-core", version.ref = "revenuecat" }
 revenuecat-ui = { module = "com.revenuecat.purchases:purchases-kmp-ui", version.ref = "revenuecat-ui" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity-compose" }
+navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation-compose" }
+lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
 
 [plugins]
 android-library = { id = "com.android.library", version.ref = "agp" }
+android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

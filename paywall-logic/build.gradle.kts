@@ -23,6 +23,7 @@ kotlin {
         it.binaries.framework {
             baseName = "RevenueCatSharedPaywallLogic"
             isStatic = true
+            export(project(":core"))
         }
     }
 

@@ -1,0 +1,6 @@
+platform :ios, '16.0'
+
+target 'ExampleApp' do
+  use_frameworks! :linkage => :static
+  pod 'PurchasesHybridCommon', '17.33.1'
+end
