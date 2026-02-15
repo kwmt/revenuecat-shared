@@ -11,6 +11,8 @@ group = groupId
 version = versionName
 
 kotlin {
+    jvmToolchain(17)
+
     androidTarget {
         publishLibraryVariants("release")
     }
