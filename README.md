@@ -5,7 +5,7 @@
 ## モジュール構成
 
 | モジュール | 内容 | 依存が必要なケース |
-|---|---|---|
+|---|---|---|   
 | `:core` | SDK初期化・購入・リストア・Entitlement確認 | 全アプリ必須 |
 | `:paywall-logic` | PaywallViewModel / PaywallState | Paywall画面を作るアプリ |
 | `:paywall-compose` | デフォルトPaywall Composable | UIをカスタマイズしないアプリ |
@@ -17,6 +17,13 @@
 各アプリの `settings.gradle.kts`:
 
 ```kotlin
+import java.util.Properties
+
+val localProps = Properties().apply {
+    val file = rootProject.projectDir.resolve("local.properties")
+    if (file.exists()) load(file.inputStream())
+}
+
 dependencyResolutionManagement {
     repositories {
         google()
@@ -24,15 +31,15 @@ dependencyResolutionManagement {
         maven {
             url = uri("https://maven.pkg.github.com/kwmt/revenuecat-shared")
             credentials {
-                username = providers.gradleProperty("gpr.user").orElse("").get()
-                password = providers.gradleProperty("gpr.token").orElse("").get()
+                username = localProps.getProperty("gpr.user") ?: ""
+                password = localProps.getProperty("gpr.token") ?: ""
             }
         }
     }
 }
 ```
 
-`~/.gradle/gradle.properties` に認証情報を追加:
+`local.properties` に認証情報を追加:
 
 ```properties
 gpr.user=YOUR_GITHUB_USERNAME
@@ -61,6 +68,81 @@ commonMain.dependencies {
     // implementation(libs.revenuecat.shared.paywall.compose)
 }
 ```
+
+### 3. iOS ネイティブ依存のリンク
+
+KMP の `purchases-kmp-core` は RevenueCat iOS ネイティブ SDK をラップしていますが、ネイティブフレームワーク自体は消費側アプリで別途提供する必要があります（KMP + Maven 配布の制約）。
+
+#### バージョン対応ルール
+
+`purchases-kmp-core` のバージョン（例: `2.5.1+17.33.1`）の `+` 以降がネイティブ SDK のバージョンです。
+`revenuecat-shared` が使用しているバージョンに合わせてください。
+
+#### iOS 最小バージョン要件
+
+iOS Deployment Target を **17.0 以上** に設定してください。
+
+#### CocoaPods で追加（推奨）
+
+KMP プロジェクトでは `kotlin-cocoapods` プラグインを使うと、Gradle から iOS ネイティブ依存を宣言的に管理できます。
+
+**1.** iOS フレームワークをビルドしている shared モジュールの `build.gradle.kts` に `cocoapods` プラグインを追加:
+
+```kotlin
+plugins {
+    // 既存のプラグイン
+    kotlin("multiplatform")
+    kotlin("native.cocoapods") // 追加
+}
+```
+
+**2.** `kotlin {}` ブロック内に `cocoapods {}` を追加し、手動フレームワーク設定を置き換え:
+
+```kotlin
+kotlin {
+    // 変更前:
+    // listOf(iosArm64(), iosSimulatorArm64()).forEach {
+    //     it.binaries.framework {
+    //         baseName = "SharedApp"
+    //         isStatic = true
+    //     }
+    // }
+
+    // 変更後:
+    iosArm64()
+    iosSimulatorArm64()
+
+    cocoapods {
+        summary = "Shared module"
+        homepage = "https://github.com/example"
+        version = "1.0"
+        ios.deploymentTarget = "17.0"
+        framework {
+            baseName = "SharedApp"
+            isStatic = true
+        }
+        pod("PurchasesHybridCommon", "17.33.1")
+    }
+}
+```
+
+**3.** iOS プロジェクトで `pod install` を実行:
+
+```bash
+cd iosApp
+pod install
+```
+
+> **注意:** `cocoapods` プラグイン導入後は `.xcodeproj` ではなく `.xcworkspace` を開いてください。
+
+#### SPM で追加（代替）
+
+CocoaPods を使わない場合は、Xcode で手動追加できます:
+
+1. Xcode で File > Add Package Dependencies を開く
+2. URL: `https://github.com/RevenueCat/purchases-hybrid-common`
+3. Dependency Rule: Exact Version `17.33.1`
+4. `PurchasesHybridCommon` ライブラリを iOS ターゲットに追加
 
 ## 使い方
 
