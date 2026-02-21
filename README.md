@@ -5,7 +5,7 @@
 ## モジュール構成
 
 | モジュール | 内容 | 依存が必要なケース |
-|---|---|---|
+|---|---|---|   
 | `:core` | SDK初期化・購入・リストア・Entitlement確認 | 全アプリ必須 |
 | `:paywall-logic` | PaywallViewModel / PaywallState | Paywall画面を作るアプリ |
 | `:paywall-compose` | デフォルトPaywall Composable | UIをカスタマイズしないアプリ |
@@ -17,6 +17,13 @@
 各アプリの `settings.gradle.kts`:
 
 ```kotlin
+import java.util.Properties
+
+val localProps = Properties().apply {
+    val file = rootProject.projectDir.resolve("local.properties")
+    if (file.exists()) load(file.inputStream())
+}
+
 dependencyResolutionManagement {
     repositories {
         google()
@@ -24,15 +31,15 @@ dependencyResolutionManagement {
         maven {
             url = uri("https://maven.pkg.github.com/kwmt/revenuecat-shared")
             credentials {
-                username = providers.gradleProperty("gpr.user").orElse("").get()
-                password = providers.gradleProperty("gpr.token").orElse("").get()
+                username = localProps.getProperty("gpr.user") ?: ""
+                password = localProps.getProperty("gpr.token") ?: ""
             }
         }
     }
 }
 ```
 
-`~/.gradle/gradle.properties` に認証情報を追加:
+`local.properties` に認証情報を追加:
 
 ```properties
 gpr.user=YOUR_GITHUB_USERNAME
@@ -60,6 +67,32 @@ commonMain.dependencies {
     // デフォルトUIを使う場合のみ:
     // implementation(libs.revenuecat.shared.paywall.compose)
 }
+```
+
+### 3. iOS ネイティブ依存のリンク
+
+KMP の `purchases-kmp-core` は RevenueCat iOS ネイティブ SDK をラップしていますが、ネイティブフレームワーク自体は消費側アプリで別途提供する必要があります。
+
+#### バージョン対応ルール
+
+`purchases-kmp-core` のバージョン（例: `2.5.1+17.33.1`）の `+` 以降がネイティブ SDK のバージョンです。
+`revenuecat-shared` が使用しているバージョンに合わせてください。
+
+#### iOS 最小バージョン要件
+
+iOS Deployment Target を **17.0 以上** に設定してください。
+
+#### SPM で追加（推奨）
+
+1. Xcode で File > Add Package Dependencies を開く
+2. URL: `https://github.com/RevenueCat/purchases-hybrid-common`
+3. Dependency Rule: Exact Version `17.33.1`
+4. `PurchasesHybridCommon` ライブラリを iOS ターゲットに追加
+
+#### CocoaPods で追加（代替）
+
+```ruby
+pod 'PurchasesHybridCommon', '17.33.1'
 ```
 
 ## 使い方
