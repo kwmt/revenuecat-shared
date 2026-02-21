@@ -37,7 +37,7 @@ kotlin {
 }
 
 android {
-    namespace = "com.shared.revenuecat.core"
+    namespace = "io.github.kwmt.revenuecat.core"
     compileSdk = 35
 
     defaultConfig {

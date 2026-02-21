@@ -370,7 +370,7 @@
 					"$(inherited)",
 					"-ObjC",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.shared.revenuecat.example-ios";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.github.kwmt.revenuecat.example-ios";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -407,7 +407,7 @@
 					"$(inherited)",
 					"-ObjC",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.shared.revenuecat.example-ios";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.github.kwmt.revenuecat.example-ios";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;

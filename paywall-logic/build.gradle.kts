@@ -38,7 +38,7 @@ kotlin {
 }
 
 android {
-    namespace = "com.shared.revenuecat.paywall.logic"
+    namespace = "io.github.kwmt.revenuecat.paywall.logic"
     compileSdk = 35
 
     defaultConfig {

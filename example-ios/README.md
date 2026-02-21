@@ -18,7 +18,7 @@
 
 1. [RevenueCat Dashboard](https://app.revenuecat.com) にログイン
 2. 「Create new project」でプロジェクトを作成（Android と共有可能）
-3. 「iOS app」を追加 → Bundle ID: `com.shared.revenuecat.example-ios`
+3. 「iOS app」を追加 → Bundle ID: `io.github.kwmt.revenuecat.example-ios`
 
 #### 1-2. Entitlements 設定
 

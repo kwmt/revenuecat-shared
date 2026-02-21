@@ -18,7 +18,7 @@
 
 1. [RevenueCat Dashboard](https://app.revenuecat.com) にログイン
 2. 「Create new project」でプロジェクトを作成
-3. 「Android app」を追加 → パッケージ名: `com.shared.revenuecat.example`
+3. 「Android app」を追加 → パッケージ名: `io.github.kwmt.revenuecat.example`
 
 #### 1-2. Entitlements 設定
 
