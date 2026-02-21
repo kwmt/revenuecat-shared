@@ -47,9 +47,9 @@ gpr.token=YOUR_GITHUB_TOKEN  # read:packages 権限
 revenuecat-shared = "0.1.0"
 
 [libraries]
-revenuecat-shared-core = { module = "com.shared.revenuecat:core", version.ref = "revenuecat-shared" }
-revenuecat-shared-paywall-logic = { module = "com.shared.revenuecat:paywall-logic", version.ref = "revenuecat-shared" }
-revenuecat-shared-paywall-compose = { module = "com.shared.revenuecat:paywall-compose", version.ref = "revenuecat-shared" }
+revenuecat-shared-core = { module = "io.github.kwmt.revenuecat:core", version.ref = "revenuecat-shared" }
+revenuecat-shared-paywall-logic = { module = "io.github.kwmt.revenuecat:paywall-logic", version.ref = "revenuecat-shared" }
+revenuecat-shared-paywall-compose = { module = "io.github.kwmt.revenuecat:paywall-compose", version.ref = "revenuecat-shared" }
 ```
 
 ```kotlin

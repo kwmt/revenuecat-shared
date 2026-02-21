@@ -41,7 +41,7 @@ kotlin {
 }
 
 android {
-    namespace = "com.shared.revenuecat.paywall.ui"
+    namespace = "io.github.kwmt.revenuecat.paywall.ui"
     compileSdk = 35
 
     defaultConfig {

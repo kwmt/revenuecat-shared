@@ -15,11 +15,11 @@ val localProperties = Properties().apply {
 }
 
 android {
-    namespace = "com.shared.revenuecat.example"
+    namespace = "io.github.kwmt.revenuecat.example"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.shared.revenuecat.example"
+        applicationId = "io.github.kwmt.revenuecat.example"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
