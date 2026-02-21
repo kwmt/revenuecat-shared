@@ -17,13 +17,9 @@
 8. PRを作成する（タイトル: `🔖 Release v{VERSION}`）
 9. auto-mergeを有効化する（`gh pr merge --auto --merge`）
 
-### Phase 3: タグ作成（PRマージ後）
-10. PRがマージされたら、mainブランチに切り替えて最新を取得する
-11. `v{VERSION}` のタグを作成してプッシュする（`git tag v{VERSION} && git push --tags`）
-12. GitHub Actionsのpublishワークフローがタグプッシュで自動実行されることを伝える
-
 ## 注意事項
 - mainブランチにいることを確認してから実行する
 - mainブランチ以外にいる場合は警告を出してユーザーに確認する
 - タグのフォーマットは `v` プレフィックス付き（例: `v0.2.0`）
-- Phase 3はPRがマージされた後に実行する。マージ待ちの場合はPhase 2で終了し、マージ後に再度 `/release` を実行するよう案内する
+- PRがマージされると、GitHub Actions (`create-release-tag.yml`) がブランチ名からバージョンを抽出し、自動的にタグを作成・プッシュする
+- タグプッシュにより `publish.yml` が自動でトリガーされ、GitHub Packages publish & Release作成が行われる
