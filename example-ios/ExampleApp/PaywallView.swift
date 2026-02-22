@@ -2,8 +2,12 @@ import SwiftUI
 import RevenueCatSharedPaywallLogic
 
 struct PaywallView: View {
-    @StateObject private var observer = PaywallStateObserver()
+    @StateObject private var observer: PaywallStateObserver
     @State private var showError = false
+
+    init(client: RevenueCatClient) {
+        _observer = StateObject(wrappedValue: PaywallStateObserver(client: client))
+    }
 
     var body: some View {
         NavigationStack {

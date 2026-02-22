@@ -21,7 +21,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.kwmt.revenuecat.core.PurchaseResult
-import io.github.kwmt.revenuecat.core.RevenueCatManager
 import kotlinx.coroutines.launch
 
 @Composable
@@ -55,7 +54,7 @@ fun SettingsScreen() {
             onClick = {
                 scope.launch {
                     try {
-                        RevenueCatManager.login(userId)
+                        ExampleApp.revenueCatClient.login(userId)
                         statusMessage = "Logged in as: $userId"
                     } catch (e: Exception) {
                         statusMessage = "Login failed: ${e.message}"
@@ -72,7 +71,7 @@ fun SettingsScreen() {
             onClick = {
                 scope.launch {
                     try {
-                        RevenueCatManager.logout()
+                        ExampleApp.revenueCatClient.logout()
                         statusMessage = "Logged out"
                     } catch (e: Exception) {
                         statusMessage = "Logout failed: ${e.message}"
@@ -87,7 +86,7 @@ fun SettingsScreen() {
         OutlinedButton(
             onClick = {
                 scope.launch {
-                    when (val result = RevenueCatManager.restore()) {
+                    when (val result = ExampleApp.revenueCatClient.restore()) {
                         is PurchaseResult.Success -> {
                             statusMessage = if (result.isActive) {
                                 "Restore successful: Premium active"

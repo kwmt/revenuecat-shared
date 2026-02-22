@@ -1,19 +1,22 @@
 import SwiftUI
+import RevenueCatSharedPaywallLogic
 
 struct ContentView: View {
+    let client: RevenueCatClient
+
     var body: some View {
         TabView {
-            HomeView()
+            HomeView(client: client)
                 .tabItem {
                     Label("Home", systemImage: "house")
                 }
 
-            PaywallView()
+            PaywallView(client: client)
                 .tabItem {
                     Label("Paywall", systemImage: "cart")
                 }
 
-            SettingsView()
+            SettingsView(client: client)
                 .tabItem {
                     Label("Settings", systemImage: "gear")
                 }

@@ -11,6 +11,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import io.github.kwmt.revenuecat.core.PackageInfo
+import io.github.kwmt.revenuecat.core.RevenueCatClient
 import io.github.kwmt.revenuecat.paywall.PaywallState
 import io.github.kwmt.revenuecat.paywall.PaywallViewModel
 
@@ -31,11 +32,12 @@ data class PaywallTheme(
  */
 @Composable
 fun DefaultPaywall(
+    client: RevenueCatClient,
     theme: PaywallTheme = PaywallTheme(),
     purchaseParams: Any,
     onDismiss: () -> Unit = {},
     onPurchaseSuccess: () -> Unit = {},
-    viewModel: PaywallViewModel = remember { PaywallViewModel() },
+    viewModel: PaywallViewModel = remember { PaywallViewModel(client) },
 ) {
     val state by viewModel.state.collectAsState()
 

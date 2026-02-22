@@ -10,33 +10,30 @@ import com.revenuecat.purchases.kmp.ktx.awaitPurchase
 import com.revenuecat.purchases.kmp.ktx.awaitRestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlin.concurrent.Volatile
 import kotlinx.coroutines.flow.asStateFlow
 
 /**
- * RevenueCat操作の共通マネージャー。
+ * [RevenueCatClient] の実装クラス。
  *
- * 使い方:
- * ```
- * RevenueCatManager.configure(RevenueCatConfig(apiKey = "appl_XXXXX"))
- * val isPremium = RevenueCatManager.checkEntitlement()
- * ```
+ * インスタンスの生成には [RevenueCatClientFactory.create] を使用する。
  */
-object RevenueCatManager {
+internal class RevenueCatClientImpl : RevenueCatClient {
 
+    @Volatile
     private var config: RevenueCatConfig? = null
 
     private val _entitlementStatus = MutableStateFlow(EntitlementStatus(isActive = false))
-    val entitlementStatus: StateFlow<EntitlementStatus> = _entitlementStatus.asStateFlow()
+    override val entitlementStatus: StateFlow<EntitlementStatus> = _entitlementStatus.asStateFlow()
 
-    /** キャッシュベースで即座にEntitlementを確認する */
-    val isPremium: Boolean
+    override val isPremium: Boolean
         get() = _entitlementStatus.value.isActive
 
     // -------------------------------------------------------
     // 初期化
     // -------------------------------------------------------
 
-    fun configure(config: RevenueCatConfig) {
+    override fun configure(config: RevenueCatConfig) {
         this.config = config
 
         Purchases.logLevel = if (config.debugLogsEnabled) {
@@ -54,7 +51,7 @@ object RevenueCatManager {
     // Entitlement 確認
     // -------------------------------------------------------
 
-    suspend fun checkEntitlement(): EntitlementStatus {
+    override suspend fun checkEntitlement(): EntitlementStatus {
         val entitlementId = requireConfig().entitlementId
         return try {
             val customerInfo = Purchases.sharedInstance.awaitCustomerInfo()
@@ -75,7 +72,7 @@ object RevenueCatManager {
     // Offerings
     // -------------------------------------------------------
 
-    suspend fun fetchOfferings(): List<OfferingInfo> {
+    override suspend fun fetchOfferings(): List<OfferingInfo> {
         val offerings = Purchases.sharedInstance.awaitOfferings()
         return offerings.all.values.map { offering ->
             OfferingInfo(
@@ -92,7 +89,7 @@ object RevenueCatManager {
         }
     }
 
-    suspend fun fetchCurrentOfferingPackages(): List<PackageInfo> {
+    override suspend fun fetchCurrentOfferingPackages(): List<PackageInfo> {
         val offerings = Purchases.sharedInstance.awaitOfferings()
         val current = offerings.current ?: return emptyList()
         return current.availablePackages.map { pkg ->
@@ -109,7 +106,7 @@ object RevenueCatManager {
     // 購入
     // -------------------------------------------------------
 
-    suspend fun purchase(purchaseParams: Any, packageInfo: PackageInfo): PurchaseResult {
+    override suspend fun purchase(purchaseParams: Any, packageInfo: PackageInfo): PurchaseResult {
         val pkg = packageInfo.rcPackage as com.revenuecat.purchases.kmp.models.Package
         return try {
             val result = Purchases.sharedInstance.awaitPurchase(pkg)
@@ -134,7 +131,7 @@ object RevenueCatManager {
     // リストア
     // -------------------------------------------------------
 
-    suspend fun restore(): PurchaseResult {
+    override suspend fun restore(): PurchaseResult {
         return try {
             val customerInfo = Purchases.sharedInstance.awaitRestore()
             val isActive = customerInfo
@@ -151,12 +148,12 @@ object RevenueCatManager {
     // ユーザー管理
     // -------------------------------------------------------
 
-    suspend fun login(appUserId: String) {
+    override suspend fun login(appUserId: String) {
         Purchases.sharedInstance.awaitLogIn(appUserId)
         checkEntitlement()
     }
 
-    suspend fun logout() {
+    override suspend fun logout() {
         Purchases.sharedInstance.awaitLogOut()
         _entitlementStatus.value = EntitlementStatus(isActive = false)
     }
@@ -167,7 +164,7 @@ object RevenueCatManager {
 
     private fun requireConfig(): RevenueCatConfig {
         return config ?: error(
-            "RevenueCatManager is not configured. Call RevenueCatManager.configure() first."
+            "RevenueCatClient is not configured. Call client.configure() first."
         )
     }
 }

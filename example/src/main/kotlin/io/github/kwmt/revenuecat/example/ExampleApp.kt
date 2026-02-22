@@ -2,15 +2,21 @@ package io.github.kwmt.revenuecat.example
 
 import android.app.Application
 import android.util.Log
+import io.github.kwmt.revenuecat.core.RevenueCatClient
+import io.github.kwmt.revenuecat.core.RevenueCatClientFactory
 import io.github.kwmt.revenuecat.core.RevenueCatConfig
-import io.github.kwmt.revenuecat.core.RevenueCatManager
 
 class ExampleApp : Application() {
+    companion object {
+        lateinit var revenueCatClient: RevenueCatClient
+    }
+
     override fun onCreate() {
         super.onCreate()
+        revenueCatClient = RevenueCatClientFactory.create()
         val apiKey = BuildConfig.REVENUECAT_API_KEY
         if (apiKey.isNotBlank()) {
-            RevenueCatManager.configure(
+            revenueCatClient.configure(
                 RevenueCatConfig(
                     apiKey = apiKey,
                     debugLogsEnabled = BuildConfig.DEBUG,

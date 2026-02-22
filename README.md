@@ -150,7 +150,8 @@ CocoaPods を使わない場合は、Xcode で手動追加できます:
 
 ```kotlin
 // Android: Application.onCreate() 等
-RevenueCatManager.configure(
+val client = RevenueCatClientFactory.create()
+client.configure(
     RevenueCatConfig(
         apiKey = "goog_XXXXX",  // or "appl_XXXXX"
         entitlementId = "premium",
@@ -163,14 +164,14 @@ RevenueCatManager.configure(
 
 ```kotlin
 // suspend で確認（ネットワークあり）
-val status = RevenueCatManager.checkEntitlement()
+val status = client.checkEntitlement()
 if (status.isActive) { /* プレミアム機能を開放 */ }
 
 // キャッシュで即時確認
-if (RevenueCatManager.isPremium) { /* ... */ }
+if (client.isPremium) { /* ... */ }
 
 // StateFlow で監視
-RevenueCatManager.entitlementStatus.collect { status ->
+client.entitlementStatus.collect { status ->
     // UI更新
 }
 ```
@@ -182,7 +183,7 @@ RevenueCatManager.entitlementStatus.collect { status ->
 ```kotlin
 @Composable
 fun MyCustomPaywall(activity: Activity) {
-    val viewModel = remember { PaywallViewModel() }
+    val viewModel = remember { PaywallViewModel(client) }
     val state by viewModel.state.collectAsState()
 
     LaunchedEffect(Unit) { viewModel.loadOfferings() }
@@ -204,6 +205,7 @@ fun MyCustomPaywall(activity: Activity) {
 @Composable
 fun PaywallScreen(activity: Activity) {
     DefaultPaywall(
+        client = client,
         theme = PaywallTheme(
             title = "Go Premium",
             subtitle = "Unlock all features",
