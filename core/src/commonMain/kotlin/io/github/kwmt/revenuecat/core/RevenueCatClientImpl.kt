@@ -118,14 +118,7 @@ internal class RevenueCatClientImpl : RevenueCatClient {
             _entitlementStatus.value = EntitlementStatus(isActive = isActive)
             PurchaseResult.Success(isActive = isActive)
         } catch (e: Exception) {
-            when {
-                e is PurchasesTransactionException && e.userCancelled -> PurchaseResult.Cancelled
-                e is PurchasesException -> PurchaseResult.Error(
-                    message = e.message ?: "Unknown error",
-                    code = e.code.code,
-                )
-                else -> PurchaseResult.Error(message = e.message ?: "Unknown error")
-            }
+            mapPurchaseException(e)
         }
     }
 
