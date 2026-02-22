@@ -8,6 +8,8 @@ import com.revenuecat.purchases.kmp.ktx.awaitLogOut
 import com.revenuecat.purchases.kmp.ktx.awaitOfferings
 import com.revenuecat.purchases.kmp.ktx.awaitPurchase
 import com.revenuecat.purchases.kmp.ktx.awaitRestore
+import com.revenuecat.purchases.kmp.models.PurchasesException
+import com.revenuecat.purchases.kmp.models.PurchasesTransactionException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlin.concurrent.Volatile
@@ -116,13 +118,13 @@ internal class RevenueCatClientImpl : RevenueCatClient {
             _entitlementStatus.value = EntitlementStatus(isActive = isActive)
             PurchaseResult.Success(isActive = isActive)
         } catch (e: Exception) {
-            val message = e.message ?: "Unknown error"
-            if (message.contains("userCancelled", ignoreCase = true) ||
-                message.contains("PurchaseCancelled", ignoreCase = true)
-            ) {
-                PurchaseResult.Cancelled
-            } else {
-                PurchaseResult.Error(message = message)
+            when {
+                e is PurchasesTransactionException && e.userCancelled -> PurchaseResult.Cancelled
+                e is PurchasesException -> PurchaseResult.Error(
+                    message = e.message ?: "Unknown error",
+                    code = e.code.code,
+                )
+                else -> PurchaseResult.Error(message = e.message ?: "Unknown error")
             }
         }
     }
