@@ -2,7 +2,7 @@ package io.github.kwmt.revenuecat.core
 
 /**
  * アプリごとに異なる設定値。
- * 各アプリは起動時にこれを生成して [RevenueCatManager.configure] に渡す。
+ * 各アプリは起動時にこれを生成して [RevenueCatClient.configure] に渡す。
  */
 data class RevenueCatConfig(
     /** RevenueCat API Key (プラットフォームごとに異なる) */

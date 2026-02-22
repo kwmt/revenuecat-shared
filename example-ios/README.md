@@ -121,9 +121,9 @@ Sandbox 環境では定期購入の更新サイクルが短縮されます：
 
 | 画面 | 機能 | 使用API |
 |------|------|---------|
-| Home | Entitlement Status 表示、Check Entitlement | `RevenueCatManager.entitlementStatus` |
+| Home | Entitlement Status 表示、Check Entitlement | `RevenueCatClient.entitlementStatus` |
 | Paywall | パッケージ一覧・選択・購入・リストア | `PaywallViewModel` |
-| Settings | User ID 入力、Login/Logout、Restore | `RevenueCatManager.login/logout/restore` |
+| Settings | User ID 入力、Login/Logout、Restore | `RevenueCatClient.login/logout/restore` |
 
 ## 技術的な補足
 

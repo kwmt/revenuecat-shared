@@ -40,7 +40,7 @@ import io.github.kwmt.revenuecat.paywall.PaywallViewModel
 
 @Composable
 fun PaywallScreen() {
-    val viewModel = remember { PaywallViewModel() }
+    val viewModel = remember { PaywallViewModel(ExampleApp.revenueCatClient) }
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current

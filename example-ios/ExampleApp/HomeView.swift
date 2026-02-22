@@ -24,7 +24,7 @@ struct HomeView: View {
                 }
 
                 Button("Check Entitlement") {
-                    RevenueCatManager.shared.checkEntitlement { _, _ in }
+                    ExampleAppApp.revenueCatClient.checkEntitlement { _, _ in }
                 }
                 .buttonStyle(.borderedProminent)
 

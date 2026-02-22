@@ -15,14 +15,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import io.github.kwmt.revenuecat.core.RevenueCatManager
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 @Composable
 fun HomeScreen(onNavigateToPaywall: () -> Unit) {
-    val status by RevenueCatManager.entitlementStatus.collectAsStateWithLifecycle()
+    val status by ExampleApp.revenueCatClient.entitlementStatus.collectAsStateWithLifecycle()
 
     Column(
         modifier = Modifier

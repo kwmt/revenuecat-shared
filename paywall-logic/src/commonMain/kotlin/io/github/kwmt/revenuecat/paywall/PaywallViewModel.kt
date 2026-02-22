@@ -2,7 +2,7 @@ package io.github.kwmt.revenuecat.paywall
 
 import io.github.kwmt.revenuecat.core.PackageInfo
 import io.github.kwmt.revenuecat.core.PurchaseResult
-import io.github.kwmt.revenuecat.core.RevenueCatManager
+import io.github.kwmt.revenuecat.core.RevenueCatClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -20,12 +20,12 @@ import kotlinx.coroutines.launch
  * - SwiftUI: SKIE 等で StateFlow → Publisher 変換して購読
  */
 class PaywallViewModel(
-    private val manager: RevenueCatManager = RevenueCatManager,
+    private val client: RevenueCatClient,
     private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main),
 ) {
     /** iOS (Swift) 向けファクトリ。Kotlin/Native はデフォルト引数をエクスポートしないため。 */
     companion object {
-        fun create(): PaywallViewModel = PaywallViewModel()
+        fun create(client: RevenueCatClient): PaywallViewModel = PaywallViewModel(client)
     }
 
     private val _state = MutableStateFlow(PaywallState())
@@ -35,12 +35,12 @@ class PaywallViewModel(
         scope.launch {
             _state.update { it.copy(isLoading = true, errorMessage = null) }
             try {
-                val entitlement = manager.checkEntitlement()
+                val entitlement = client.checkEntitlement()
                 if (entitlement.isActive) {
                     _state.update { it.copy(isLoading = false, isPremium = true) }
                     return@launch
                 }
-                val packages = manager.fetchCurrentOfferingPackages()
+                val packages = client.fetchCurrentOfferingPackages()
                 _state.update {
                     it.copy(
                         isLoading = false,
@@ -64,7 +64,7 @@ class PaywallViewModel(
         val selected = _state.value.selectedPackage ?: return
         scope.launch {
             _state.update { it.copy(isPurchasing = true, errorMessage = null) }
-            when (val result = manager.purchase(purchaseParams, selected)) {
+            when (val result = client.purchase(purchaseParams, selected)) {
                 is PurchaseResult.Success -> _state.update {
                     it.copy(isPurchasing = false, isPremium = result.isActive, purchaseSuccess = result.isActive)
                 }
@@ -81,7 +81,7 @@ class PaywallViewModel(
     fun restore() {
         scope.launch {
             _state.update { it.copy(isPurchasing = true, errorMessage = null) }
-            when (val result = manager.restore()) {
+            when (val result = client.restore()) {
                 is PurchaseResult.Success -> _state.update {
                     it.copy(isPurchasing = false, isPremium = result.isActive, purchaseSuccess = result.isActive)
                 }

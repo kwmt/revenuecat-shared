@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.onEach
  *
  * 使い方 (Swift):
  * ```swift
- * let closeable = FlowHelper.shared.observeEntitlementStatus { status in
+ * let closeable = FlowHelper.shared.observeEntitlementStatus(client: client) { status in
  *     self.isActive = status.isActive
  * }
  * // 不要になったら
@@ -26,11 +26,14 @@ import kotlinx.coroutines.flow.onEach
 object FlowHelper {
 
     /**
-     * [RevenueCatManager.entitlementStatus] を監視し、値が変化するたびに [onEach] を呼び出す。
+     * [RevenueCatClient.entitlementStatus] を監視し、値が変化するたびに [onEach] を呼び出す。
      * 返却された [Closeable] を close() すると監視が停止する。
      */
-    fun observeEntitlementStatus(onEach: (EntitlementStatus) -> Unit): Closeable {
-        return observeStateFlow(RevenueCatManager.entitlementStatus, onEach)
+    fun observeEntitlementStatus(
+        client: RevenueCatClient,
+        onEach: (EntitlementStatus) -> Unit,
+    ): Closeable {
+        return observeStateFlow(client.entitlementStatus, onEach)
     }
 
     /**
