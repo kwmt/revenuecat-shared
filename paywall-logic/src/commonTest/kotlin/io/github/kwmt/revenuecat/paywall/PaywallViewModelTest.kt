@@ -152,6 +152,21 @@ class PaywallViewModelTest {
     }
 
     @Test
+    fun purchase_whenSuccessButNotActive_doesNotSetPremium() = testScope.runTest {
+        fakeClient.entitlementToReturn = EntitlementStatus(isActive = false)
+        fakeClient.packagesToReturn = samplePackages
+        viewModel.loadOfferings()
+
+        fakeClient.purchaseResultToReturn = PurchaseResult.Success(isActive = false)
+        viewModel.purchase("params")
+
+        val state = viewModel.state.value
+        assertFalse(state.isPurchasing)
+        assertFalse(state.isPremium)
+        assertFalse(state.purchaseSuccess)
+    }
+
+    @Test
     fun purchase_whenCancelled_onlyStopsLoadingIndicator() = testScope.runTest {
         fakeClient.entitlementToReturn = EntitlementStatus(isActive = false)
         fakeClient.packagesToReturn = samplePackages
@@ -164,6 +179,24 @@ class PaywallViewModelTest {
         assertFalse(state.isPurchasing)
         assertFalse(state.isPremium)
         assertFalse(state.purchaseSuccess)
+        assertNull(state.errorMessage)
+    }
+
+    @Test
+    fun purchase_whenCancelled_doesNotClearPreviousError() = testScope.runTest {
+        fakeClient.entitlementToReturn = EntitlementStatus(isActive = false)
+        fakeClient.packagesToReturn = samplePackages
+        viewModel.loadOfferings()
+
+        // 1回目: エラーを発生させる
+        fakeClient.purchaseResultToReturn = PurchaseResult.Error("first error")
+        viewModel.purchase("params")
+        assertEquals("first error", viewModel.state.value.errorMessage)
+
+        // 2回目: キャンセル → errorMessage は purchase 開始時にクリアされる
+        fakeClient.purchaseResultToReturn = PurchaseResult.Cancelled
+        viewModel.purchase("params")
+        assertNull(viewModel.state.value.errorMessage)
     }
 
     @Test
@@ -193,6 +226,36 @@ class PaywallViewModelTest {
         val state = viewModel.state.value
         assertFalse(state.isPurchasing)
         assertEquals("unexpected crash", state.errorMessage)
+    }
+
+    @Test
+    fun purchase_whenExceptionWithNullMessage_showsFallbackError() = testScope.runTest {
+        fakeClient.entitlementToReturn = EntitlementStatus(isActive = false)
+        fakeClient.packagesToReturn = samplePackages
+        viewModel.loadOfferings()
+
+        fakeClient.shouldThrowOnPurchase = true
+        fakeClient.purchaseError = RuntimeException(null as String?)
+        viewModel.purchase("params")
+
+        val state = viewModel.state.value
+        assertFalse(state.isPurchasing)
+        assertEquals("Purchase failed", state.errorMessage)
+    }
+
+    @Test
+    fun purchase_passesSelectedPackageToClient() = testScope.runTest {
+        fakeClient.entitlementToReturn = EntitlementStatus(isActive = false)
+        fakeClient.packagesToReturn = samplePackages
+        viewModel.loadOfferings()
+
+        val second = samplePackages[1]
+        viewModel.selectPackage(second)
+        fakeClient.purchaseResultToReturn = PurchaseResult.Success(isActive = true)
+        viewModel.purchase("activity")
+
+        assertEquals(second, fakeClient.lastPurchasePackage)
+        assertEquals("activity", fakeClient.lastPurchaseParams)
     }
 
     @Test
