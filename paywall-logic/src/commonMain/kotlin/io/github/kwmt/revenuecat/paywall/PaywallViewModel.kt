@@ -64,15 +64,21 @@ class PaywallViewModel(
         val selected = _state.value.selectedPackage ?: return
         scope.launch {
             _state.update { it.copy(isPurchasing = true, errorMessage = null) }
-            when (val result = client.purchase(purchaseParams, selected)) {
-                is PurchaseResult.Success -> _state.update {
-                    it.copy(isPurchasing = false, isPremium = result.isActive, purchaseSuccess = result.isActive)
+            try {
+                when (val result = client.purchase(purchaseParams, selected)) {
+                    is PurchaseResult.Success -> _state.update {
+                        it.copy(isPurchasing = false, isPremium = result.isActive, purchaseSuccess = result.isActive)
+                    }
+                    is PurchaseResult.Cancelled -> _state.update {
+                        it.copy(isPurchasing = false)
+                    }
+                    is PurchaseResult.Error -> _state.update {
+                        it.copy(isPurchasing = false, errorMessage = result.message)
+                    }
                 }
-                is PurchaseResult.Cancelled -> _state.update {
-                    it.copy(isPurchasing = false)
-                }
-                is PurchaseResult.Error -> _state.update {
-                    it.copy(isPurchasing = false, errorMessage = result.message)
+            } catch (e: Exception) {
+                _state.update {
+                    it.copy(isPurchasing = false, errorMessage = e.message ?: "Purchase failed")
                 }
             }
         }
@@ -81,14 +87,22 @@ class PaywallViewModel(
     fun restore() {
         scope.launch {
             _state.update { it.copy(isPurchasing = true, errorMessage = null) }
-            when (val result = client.restore()) {
-                is PurchaseResult.Success -> _state.update {
-                    it.copy(isPurchasing = false, isPremium = result.isActive, purchaseSuccess = result.isActive)
+            try {
+                when (val result = client.restore()) {
+                    is PurchaseResult.Success -> _state.update {
+                        it.copy(isPurchasing = false, isPremium = result.isActive, purchaseSuccess = result.isActive)
+                    }
+                    is PurchaseResult.Cancelled -> _state.update {
+                        it.copy(isPurchasing = false)
+                    }
+                    is PurchaseResult.Error -> _state.update {
+                        it.copy(isPurchasing = false, errorMessage = result.message)
+                    }
                 }
-                is PurchaseResult.Error -> _state.update {
-                    it.copy(isPurchasing = false, errorMessage = result.message)
+            } catch (e: Exception) {
+                _state.update {
+                    it.copy(isPurchasing = false, errorMessage = e.message ?: "Restore failed")
                 }
-                else -> _state.update { it.copy(isPurchasing = false) }
             }
         }
     }
