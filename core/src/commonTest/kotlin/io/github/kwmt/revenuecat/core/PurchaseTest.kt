@@ -9,17 +9,20 @@ import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlin.test.assertNull
 
-class PurchaseExceptionMapperTest {
+/**
+ * purchase 処理における例外ハンドリングのテスト。
+ *
+ * RevenueCatClientImpl.purchase() 内で発生する例外が
+ * 正しく PurchaseResult にマッピングされることを検証する。
+ */
+class PurchaseTest {
 
-    // --- PurchasesTransactionException (userCancelled = true) ---
+    // --- キャンセル検出 ---
 
     @Test
-    fun whenUserCancelled_returnsCancelled() {
-        val error = PurchasesError(
-            code = PurchasesErrorCode.PurchaseCancelledError,
-        )
+    fun purchase_whenUserCancelled_returnsCancelled() {
         val exception = PurchasesTransactionException(
-            purchasesError = error,
+            purchasesError = PurchasesError(code = PurchasesErrorCode.PurchaseCancelledError),
             userCancelled = true,
         )
 
@@ -28,16 +31,13 @@ class PurchaseExceptionMapperTest {
         assertIs<PurchaseResult.Cancelled>(result)
     }
 
-    // --- PurchasesTransactionException (userCancelled = false) ---
-
     @Test
-    fun whenTransactionException_notCancelled_returnsErrorWithCode() {
-        val error = PurchasesError(
-            code = PurchasesErrorCode.StoreProblemError,
-            underlyingErrorMessage = "Store unavailable",
-        )
+    fun purchase_whenTransactionError_notCancelled_returnsErrorWithCode() {
         val exception = PurchasesTransactionException(
-            purchasesError = error,
+            purchasesError = PurchasesError(
+                code = PurchasesErrorCode.StoreProblemError,
+                underlyingErrorMessage = "Store unavailable",
+            ),
             userCancelled = false,
         )
 
@@ -47,15 +47,16 @@ class PurchaseExceptionMapperTest {
         assertEquals(PurchasesErrorCode.StoreProblemError.code, result.code)
     }
 
-    // --- PurchasesException ---
+    // --- SDK エラー ---
 
     @Test
-    fun whenPurchasesException_returnsErrorWithCode() {
-        val error = PurchasesError(
-            code = PurchasesErrorCode.NetworkError,
-            underlyingErrorMessage = "Connection timeout",
+    fun purchase_whenNetworkError_returnsErrorWithCode() {
+        val exception = PurchasesException(
+            PurchasesError(
+                code = PurchasesErrorCode.NetworkError,
+                underlyingErrorMessage = "Connection timeout",
+            )
         )
-        val exception = PurchasesException(error)
 
         val result = mapPurchaseException(exception)
 
@@ -64,24 +65,24 @@ class PurchaseExceptionMapperTest {
     }
 
     @Test
-    fun whenPurchasesException_messageIsPreserved() {
-        val error = PurchasesError(
-            code = PurchasesErrorCode.ProductAlreadyPurchasedError,
-            underlyingErrorMessage = "Already purchased",
+    fun purchase_whenSdkError_preservesMessage() {
+        val exception = PurchasesException(
+            PurchasesError(
+                code = PurchasesErrorCode.ProductAlreadyPurchasedError,
+                underlyingErrorMessage = "Already purchased",
+            )
         )
-        val exception = PurchasesException(error)
 
         val result = mapPurchaseException(exception)
 
         assertIs<PurchaseResult.Error>(result)
-        // PurchasesException.message comes from the error
         assertEquals(exception.message, result.message)
     }
 
-    // --- Generic Exception ---
+    // --- 予期しない例外 ---
 
     @Test
-    fun whenGenericException_returnsErrorWithMessage() {
+    fun purchase_whenUnexpectedException_returnsErrorWithMessage() {
         val exception = RuntimeException("unexpected error")
 
         val result = mapPurchaseException(exception)
@@ -92,7 +93,7 @@ class PurchaseExceptionMapperTest {
     }
 
     @Test
-    fun whenGenericException_nullMessage_returnsUnknownError() {
+    fun purchase_whenExceptionWithNullMessage_returnsUnknownError() {
         val exception = RuntimeException(null as String?)
 
         val result = mapPurchaseException(exception)
