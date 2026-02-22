@@ -8,9 +8,9 @@ class EntitlementStatusObserver: ObservableObject {
 
     private var closeable: (any Closeable)?
 
-    init() {
+    init(client: RevenueCatClient) {
         self.status = EntitlementStatus(isActive: false, willRenew: false, expirationDateMillis: nil)
-        self.closeable = FlowHelper.shared.observeEntitlementStatus(client: ExampleAppApp.revenueCatClient) { [weak self] status in
+        self.closeable = FlowHelper.shared.observeEntitlementStatus(client: client) { [weak self] status in
             DispatchQueue.main.async {
                 self?.status = status
             }
@@ -29,8 +29,8 @@ class PaywallStateObserver: ObservableObject {
 
     private var closeable: (any Closeable)?
 
-    init() {
-        let vm = PaywallViewModel.companion.create(client: ExampleAppApp.revenueCatClient)
+    init(client: RevenueCatClient) {
+        let vm = PaywallViewModel.companion.create(client: client)
         self.viewModel = vm
         self.state = (vm.state.value as? PaywallState) ?? PaywallState(
             isLoading: true, isPurchasing: false, isPremium: false,

@@ -2,6 +2,7 @@ import SwiftUI
 import RevenueCatSharedPaywallLogic
 
 struct SettingsView: View {
+    let client: RevenueCatClient
     @State private var userId = ""
     @State private var statusMessage = ""
 
@@ -15,7 +16,7 @@ struct SettingsView: View {
 
                     Button("Login") {
                         guard !userId.isEmpty else { return }
-                        ExampleAppApp.revenueCatClient.login(appUserId: userId) { error in
+                        client.login(appUserId: userId) { error in
                             DispatchQueue.main.async {
                                 if let error = error {
                                     statusMessage = "Login failed: \(error.localizedDescription)"
@@ -28,7 +29,7 @@ struct SettingsView: View {
                     .disabled(userId.isEmpty)
 
                     Button("Logout") {
-                        ExampleAppApp.revenueCatClient.logout { error in
+                        client.logout { error in
                             DispatchQueue.main.async {
                                 if let error = error {
                                     statusMessage = "Logout failed: \(error.localizedDescription)"
@@ -44,7 +45,7 @@ struct SettingsView: View {
                 Section("Purchases") {
                     Button("Restore Purchases") {
                         statusMessage = "Restoring..."
-                        ExampleAppApp.revenueCatClient.restore { result, error in
+                        client.restore { result, error in
                             DispatchQueue.main.async {
                                 if let error = error {
                                     statusMessage = "Restore failed: \(error.localizedDescription)"

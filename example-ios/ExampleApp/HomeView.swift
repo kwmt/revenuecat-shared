@@ -2,7 +2,13 @@ import SwiftUI
 import RevenueCatSharedPaywallLogic
 
 struct HomeView: View {
-    @StateObject private var observer = EntitlementStatusObserver()
+    let client: RevenueCatClient
+    @StateObject private var observer: EntitlementStatusObserver
+
+    init(client: RevenueCatClient) {
+        self.client = client
+        _observer = StateObject(wrappedValue: EntitlementStatusObserver(client: client))
+    }
 
     var body: some View {
         NavigationStack {
@@ -24,7 +30,7 @@ struct HomeView: View {
                 }
 
                 Button("Check Entitlement") {
-                    ExampleAppApp.revenueCatClient.checkEntitlement { _, _ in }
+                    client.checkEntitlement { _, _ in }
                 }
                 .buttonStyle(.borderedProminent)
 
