@@ -174,6 +174,25 @@ if (client.isPremium) { /* ... */ }
 client.entitlementStatus.collect { status ->
     // UI更新
 }
+
+// 確認に失敗したら null（checkEntitlement は失敗も isActive = false に丸める）。
+// 購読状態を端末に保存するアプリは、確認できなかった回に上書きしないためにこちらを使う
+client.checkEntitlementOrNull()?.let { status -> saveMember(status.isActive) }
+```
+
+### 無料体験の表示
+
+```kotlin
+val packages = client.fetchCurrentOfferingPackages()
+val annual = packages.first { it.packageType == PackageKind.ANNUAL }
+
+// 商品に設定された体験の長さ（App Store Connect の「1週間」は TrialPeriod(1, WEEK)）
+val trial = annual.freeTrial
+
+// その人が体験を使えるか。ELIGIBLE のときだけ「無料」と見せる
+// （Android の SDK は常に UNKNOWN。UNKNOWN は通常の価格として見せるのが RevenueCat の推奨）
+val eligibility = client.checkTrialEligibility(packages)
+val showTrial = trial != null && eligibility[annual.productIdentifier] == TrialEligibility.ELIGIBLE
 ```
 
 ### Paywall（カスタムUI）

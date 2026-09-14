@@ -8,8 +8,11 @@ import com.revenuecat.purchases.kmp.ktx.awaitLogOut
 import com.revenuecat.purchases.kmp.ktx.awaitOfferings
 import com.revenuecat.purchases.kmp.ktx.awaitPurchase
 import com.revenuecat.purchases.kmp.ktx.awaitRestore
+import com.revenuecat.purchases.kmp.ktx.awaitTrialOrIntroPriceEligibility
+import com.revenuecat.purchases.kmp.models.Package
 import com.revenuecat.purchases.kmp.models.PurchasesException
 import com.revenuecat.purchases.kmp.models.PurchasesTransactionException
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlin.concurrent.Volatile
@@ -53,7 +56,10 @@ internal class RevenueCatClientImpl : RevenueCatClient {
     // Entitlement 確認
     // -------------------------------------------------------
 
-    override suspend fun checkEntitlement(): EntitlementStatus {
+    override suspend fun checkEntitlement(): EntitlementStatus =
+        checkEntitlementOrNull() ?: EntitlementStatus(isActive = false)
+
+    override suspend fun checkEntitlementOrNull(): EntitlementStatus? {
         val entitlementId = requireConfig().entitlementId
         return try {
             val customerInfo = Purchases.sharedInstance.awaitCustomerInfo()
@@ -65,8 +71,10 @@ internal class RevenueCatClientImpl : RevenueCatClient {
             )
             _entitlementStatus.value = status
             status
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
-            EntitlementStatus(isActive = false)
+            null
         }
     }
 
@@ -79,14 +87,7 @@ internal class RevenueCatClientImpl : RevenueCatClient {
         return offerings.all.values.map { offering ->
             OfferingInfo(
                 identifier = offering.identifier,
-                availablePackages = offering.availablePackages.map { pkg ->
-                    PackageInfo(
-                        identifier = pkg.identifier,
-                        localizedPriceString = pkg.storeProduct.price.formatted,
-                        productIdentifier = pkg.storeProduct.id,
-                        rcPackage = pkg,
-                    )
-                }
+                availablePackages = offering.availablePackages.map { it.toPackageInfo() },
             )
         }
     }
@@ -94,14 +95,25 @@ internal class RevenueCatClientImpl : RevenueCatClient {
     override suspend fun fetchCurrentOfferingPackages(): List<PackageInfo> {
         val offerings = Purchases.sharedInstance.awaitOfferings()
         val current = offerings.current ?: return emptyList()
-        return current.availablePackages.map { pkg ->
-            PackageInfo(
-                identifier = pkg.identifier,
-                localizedPriceString = pkg.storeProduct.price.formatted,
-                productIdentifier = pkg.storeProduct.id,
-                rcPackage = pkg,
-            )
+        return current.availablePackages.map { it.toPackageInfo() }
+    }
+
+    override suspend fun checkTrialEligibility(packages: List<PackageInfo>): Map<String, TrialEligibility> {
+        val products = packages.mapNotNull { (it.rcPackage as? Package)?.storeProduct }
+        val byProductId = try {
+            if (products.isEmpty()) {
+                emptyMap()
+            } else {
+                Purchases.sharedInstance.awaitTrialOrIntroPriceEligibility(products)
+                    .entries
+                    .associate { (product, status) -> product.id to status.toTrialEligibility() }
+            }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            emptyMap()
         }
+        return packages.associate { it.productIdentifier to (byProductId[it.productIdentifier] ?: TrialEligibility.UNKNOWN) }
     }
 
     // -------------------------------------------------------
