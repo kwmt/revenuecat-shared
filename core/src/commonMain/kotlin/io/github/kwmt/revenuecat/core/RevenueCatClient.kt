@@ -37,6 +37,11 @@ interface RevenueCatClient {
      * 上書きしないよう、こちらを使う（通信できないだけで購入済みの人を未購入に戻さないため）。
      *
      * 成功したときは [entitlementStatus] も更新する。
+     *
+     * **既定の実装は [checkEntitlement] に委ねるだけで、失敗を区別しない（null を返さない）。**
+     * 既存の実装（テスト用の Fake など）を壊さないための既定値で、この約束は満たさない。
+     * [RevenueCatClient] を実装・ラップするクラスは、失敗を区別できるなら必ず override すること
+     * （override し忘れたラッパーを通すと、確認できなかった回に「未購入」が返り、保存済みの購読状態を消してしまう）。
      */
     suspend fun checkEntitlementOrNull(): EntitlementStatus? = checkEntitlement()
 
