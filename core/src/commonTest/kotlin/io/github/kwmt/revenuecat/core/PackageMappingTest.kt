@@ -62,6 +62,28 @@ class PackageMappingTest {
         assertEquals(PackageKind.CUSTOM, PackageType.CUSTOM.toPackageKind())
     }
 
+    /** Google Play: 無料体験の特典が届いていれば使える（SDK は Android で常に UNKNOWN を返すが、それに引きずられない）。 */
+    @Test
+    fun googlePlayFreeTrialOfferMeansTheTrialCanBeUsed() {
+        assertEquals(TrialEligibility.ELIGIBLE, trialEligibilityOf(TrialEligibility.UNKNOWN, googlePlayFreeTrialOffered = true))
+        assertEquals(TrialEligibility.ELIGIBLE, trialEligibilityOf(null, googlePlayFreeTrialOffered = true))
+    }
+
+    /** Google Play: 特典が届いていなければ使えない（体験を使い終えた人には Play が特典を返さない）。 */
+    @Test
+    fun googlePlayWithoutFreeTrialOfferMeansTheTrialCannotBeUsed() {
+        assertEquals(TrialEligibility.INELIGIBLE, trialEligibilityOf(TrialEligibility.UNKNOWN, googlePlayFreeTrialOffered = false))
+        assertEquals(TrialEligibility.INELIGIBLE, trialEligibilityOf(null, googlePlayFreeTrialOffered = false))
+    }
+
+    /** App Store: SDK の答えのまま（答えが無ければ UNKNOWN）。 */
+    @Test
+    fun appStoreKeepsTheSdkAnswer() {
+        assertEquals(TrialEligibility.ELIGIBLE, trialEligibilityOf(TrialEligibility.ELIGIBLE, googlePlayFreeTrialOffered = null))
+        assertEquals(TrialEligibility.INELIGIBLE, trialEligibilityOf(TrialEligibility.INELIGIBLE, googlePlayFreeTrialOffered = null))
+        assertEquals(TrialEligibility.UNKNOWN, trialEligibilityOf(null, googlePlayFreeTrialOffered = null))
+    }
+
     @Test
     fun onlyEligibleStatusMeansTheTrialCanBeUsed() {
         assertEquals(TrialEligibility.ELIGIBLE, IntroEligibilityStatus.ELIGIBLE.toTrialEligibility())

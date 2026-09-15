@@ -75,3 +75,27 @@ internal fun IntroEligibilityStatus.toTrialEligibility(): TrialEligibility = whe
     -> TrialEligibility.INELIGIBLE
     IntroEligibilityStatus.UNKNOWN -> TrialEligibility.UNKNOWN
 }
+
+/**
+ * 無料体験を使えるかを決める。
+ *
+ * - Google Play の定期購入（[googlePlayFreeTrialOffered] が null でない）: **SDK の答えを使わない**。RevenueCat SDK は
+ *   Android で常に UNKNOWN を返す。Play Billing が返す特典（`ProductDetails.subscriptionOfferDetails`）は
+ *   **その人が使えるものだけ**なので、無料体験の特典が届いていれば [TrialEligibility.ELIGIBLE]、
+ *   届いていなければ [TrialEligibility.INELIGIBLE]（体験を使い終えた人には特典が届かない）
+ * - それ以外（App Store）: SDK の答えのまま。答えが無ければ [TrialEligibility.UNKNOWN]
+ */
+internal fun trialEligibilityOf(sdkAnswer: TrialEligibility?, googlePlayFreeTrialOffered: Boolean?): TrialEligibility =
+    when (googlePlayFreeTrialOffered) {
+        true -> TrialEligibility.ELIGIBLE
+        false -> TrialEligibility.INELIGIBLE
+        null -> sdkAnswer ?: TrialEligibility.UNKNOWN
+    }
+
+/**
+ * Google Play の定期購入なら、その人に無料体験の特典が届いているか。Google Play の定期購入でなければ null。
+ *
+ * `subscriptionOptions` は Play Store の定期購入にしか入らない（App Store・Amazon・買い切りでは null）ので、
+ * これでストアを見分ける。
+ */
+internal fun StoreProduct.googlePlayFreeTrialOffered(): Boolean? = subscriptionOptions?.let { it.freeTrial != null }
