@@ -100,7 +100,7 @@ internal class RevenueCatClientImpl : RevenueCatClient {
 
     override suspend fun checkTrialEligibility(packages: List<PackageInfo>): Map<String, TrialEligibility> {
         val products = packages.mapNotNull { (it.rcPackage as? Package)?.storeProduct }
-        val byProductId = try {
+        val sdkAnswers = try {
             if (products.isEmpty()) {
                 emptyMap()
             } else {
@@ -113,7 +113,10 @@ internal class RevenueCatClientImpl : RevenueCatClient {
         } catch (e: Exception) {
             emptyMap()
         }
-        return packages.associate { it.productIdentifier to (byProductId[it.productIdentifier] ?: TrialEligibility.UNKNOWN) }
+        return packages.associate { info ->
+            val product = (info.rcPackage as? Package)?.storeProduct
+            info.productIdentifier to trialEligibilityOf(sdkAnswers[info.productIdentifier], product?.googlePlayFreeTrialOffered())
+        }
     }
 
     // -------------------------------------------------------

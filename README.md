@@ -190,7 +190,8 @@ val annual = packages.first { it.packageType == PackageKind.ANNUAL }
 val trial = annual.freeTrial
 
 // その人が体験を使えるか。ELIGIBLE のときだけ「無料」と見せる
-// （Android の SDK は常に UNKNOWN。UNKNOWN は通常の価格として見せるのが RevenueCat の推奨）
+// （Android は Play が返す特典で決まる: 無料体験の特典が届いていれば ELIGIBLE・無ければ INELIGIBLE。
+//   UNKNOWN は通常の価格として見せるのが RevenueCat の推奨）
 val eligibility = client.checkTrialEligibility(packages)
 val showTrial = trial != null && eligibility[annual.productIdentifier] == TrialEligibility.ELIGIBLE
 ```

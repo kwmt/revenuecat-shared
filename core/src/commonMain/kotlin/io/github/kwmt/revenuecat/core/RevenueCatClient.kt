@@ -55,7 +55,9 @@ interface RevenueCatClient {
      * 無料体験・導入価格を使えるかを、パッケージごとに確認する。キーは [PackageInfo.productIdentifier]。
      *
      * - iOS: StoreKit に問い合わせる。同じサブスクグループで体験を使ったことがあれば [TrialEligibility.INELIGIBLE]
-     * - Android: RevenueCat SDK が対応しておらず、常に [TrialEligibility.UNKNOWN] を返す
+     * - Android: Google Play が返す特典は**その人が使えるものだけ**なので、無料体験の特典が届いていれば
+     *   [TrialEligibility.ELIGIBLE]、届いていなければ [TrialEligibility.INELIGIBLE]
+     *   （RevenueCat SDK の判定は Android で常に UNKNOWN なので使わない）
      *
      * 渡したパッケージはすべてキーに含まれる。確認できなかったものは [TrialEligibility.UNKNOWN]。
      */
