@@ -52,20 +52,13 @@
 ./gradlew :paywall-logic:linkDebugFrameworkIosSimulatorArm64
 ```
 
-2. CocoaPods 依存をインストール:
-
-```bash
-cd example-ios
-pod install
-```
-
-3. `ExampleApp/Configuration.swift` に RevenueCat API キーを設定:
+2. `ExampleApp/Configuration.swift` に RevenueCat API キーを設定:
 
 ```swift
 static let revenueCatAPIKey = "appl_xxxxxxxxxxxxx"
 ```
 
-4. `ExampleApp.xcworkspace` を Xcode で開いてビルド・実行
+3. `ExampleApp.xcodeproj` を Xcode で開いてビルド・実行（CocoaPods は使いません）
 
 ## Sandbox テスト（実際の課金なし）
 
@@ -128,5 +121,5 @@ Sandbox 環境では定期購入の更新サイクルが短縮されます：
 ## 技術的な補足
 
 - KMP StateFlow の監視には `FlowHelper` 経由のコールバックパターンを使用（SKIE 不要）
-- RevenueCat iOS SDK (`PurchasesHybridCommon`) は CocoaPods で管理
+- RevenueCat iOS SDK は `purchases-kmp` 3.x が Kotlin のフレームワークに同梱する（0.0.8 から。`PurchasesHybridCommon` を足すと SDK が二重に入る）
 - `paywall-logic` フレームワークが `export(project(":core"))` で core API も公開
