@@ -69,80 +69,18 @@ commonMain.dependencies {
 }
 ```
 
-### 3. iOS ネイティブ依存のリンク
+### 3. iOS ネイティブ依存（0.0.8 以降は不要）
 
-KMP の `purchases-kmp-core` は RevenueCat iOS ネイティブ SDK をラップしていますが、ネイティブフレームワーク自体は消費側アプリで別途提供する必要があります（KMP + Maven 配布の制約）。
+0.0.8 から `purchases-kmp` 3.x を使っています。3.x は RevenueCat の iOS SDK（purchases-ios）を**ライブラリの中に同梱**しているので、
+消費側アプリで iOS のネイティブ依存を足す必要はありません。
 
-#### バージョン対応ルール
-
-`purchases-kmp-core` のバージョン（例: `2.5.1+17.33.1`）の `+` 以降がネイティブ SDK のバージョンです。
-`revenuecat-shared` が使用しているバージョンに合わせてください。
-
-#### iOS 最小バージョン要件
-
-iOS Deployment Target を **17.0 以上** に設定してください。
-
-#### CocoaPods で追加（推奨）
-
-KMP プロジェクトでは `kotlin-cocoapods` プラグインを使うと、Gradle から iOS ネイティブ依存を宣言的に管理できます。
-
-**1.** iOS フレームワークをビルドしている shared モジュールの `build.gradle.kts` に `cocoapods` プラグインを追加:
-
-```kotlin
-plugins {
-    // 既存のプラグイン
-    kotlin("multiplatform")
-    kotlin("native.cocoapods") // 追加
-}
-```
-
-**2.** `kotlin {}` ブロック内に `cocoapods {}` を追加し、手動フレームワーク設定を置き換え:
-
-```kotlin
-kotlin {
-    // 変更前:
-    // listOf(iosArm64(), iosSimulatorArm64()).forEach {
-    //     it.binaries.framework {
-    //         baseName = "SharedApp"
-    //         isStatic = true
-    //     }
-    // }
-
-    // 変更後:
-    iosArm64()
-    iosSimulatorArm64()
-
-    cocoapods {
-        summary = "Shared module"
-        homepage = "https://github.com/example"
-        version = "1.0"
-        ios.deploymentTarget = "17.0"
-        framework {
-            baseName = "SharedApp"
-            isStatic = true
-        }
-        pod("PurchasesHybridCommon", "17.33.1")
-    }
-}
-```
-
-**3.** iOS プロジェクトで `pod install` を実行:
-
-```bash
-cd iosApp
-pod install
-```
-
-> **注意:** `cocoapods` プラグイン導入後は `.xcodeproj` ではなく `.xcworkspace` を開いてください。
-
-#### SPM で追加（代替）
-
-CocoaPods を使わない場合は、Xcode で手動追加できます:
-
-1. Xcode で File > Add Package Dependencies を開く
-2. URL: `https://github.com/RevenueCat/purchases-hybrid-common`
-3. Dependency Rule: Exact Version `17.33.1`
-4. `PurchasesHybridCommon` ライブラリを iOS ターゲットに追加
+- ★**`PurchasesHybridCommon` を CocoaPods / SPM で足さないでください。** 足すと RevenueCat の SDK が二重に入ります。
+  0.0.7 から上げるときは、Podfile・`cocoapods {}` の `pod("PurchasesHybridCommon", …)`・Xcode の Package Dependencies から外してください
+- 消費側の Kotlin は **2.3.21 以上**にしてください（0.0.8 は Kotlin 2.3.21 でビルドしています。klib はそれより古い Kotlin では読めません）
+- iOS Deployment Target は **17.0 以上**に設定してください
+- 0.0.7 までの `PurchasesHybridCommon` 17.33.1 が引く purchases-ios 5.57.2 は、**Xcode 27（Swift 6.4）でコンパイルできません**
+  （`PaywallColor.swift` の `invalid redeclaration of synthesized memberwise 'init(stringRepresentation:)'`）。
+  0.0.8 は purchases-ios 5.89.0 を同梱しており、Xcode 26 と Xcode 27 の両方でビルドできます
 
 ## 使い方
 
