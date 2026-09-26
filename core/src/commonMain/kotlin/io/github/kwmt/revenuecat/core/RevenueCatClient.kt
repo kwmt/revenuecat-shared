@@ -45,6 +45,16 @@ interface RevenueCatClient {
      */
     suspend fun checkEntitlementOrNull(): EntitlementStatus? = checkEntitlement()
 
+    /**
+     * [RevenueCatConfig.entitlementId] 以外の Entitlement を、ネットワーク経由で確認する。確認に失敗したら null を返す。
+     *
+     * 段階のあるプラン（上位のプランだけに付ける Entitlement がある）を売るアプリが、2つ目以降の Entitlement を読むために使う。
+     * [entitlementStatus] は更新しない（あちらは [RevenueCatConfig.entitlementId] だけを表す）。
+     *
+     * **既定の実装は null（確認できなかった）を返す。** 既存の実装（テスト用の Fake など）を壊さないための既定値。
+     */
+    suspend fun checkEntitlementOrNull(entitlementId: String): EntitlementStatus? = null
+
     /** 全 Offering を取得する。 */
     suspend fun fetchOfferings(): List<OfferingInfo>
 
@@ -66,6 +76,20 @@ interface RevenueCatClient {
 
     /** 購入を実行する。 */
     suspend fun purchase(purchaseParams: Any, packageInfo: PackageInfo): PurchaseResult
+
+    /**
+     * 購入を実行する。Google Play で [RevenueCatConfig.entitlementId] の有効な定期購入が**別の商品**にあれば、
+     * そこからの乗り換えとして買う（[mode] の切り替え方で）。
+     *
+     * Google Play は乗り換えを明示しないと、2つの定期購入が並んで両方に請求される。App Store は同じサブスクリプショングループの中なら
+     * Apple が乗り換えにするので、ふつうの購入と同じ。乗り換えが要らない（有効な購読が無い・同じ商品・App Store）ときも、ふつうの購入をする。
+     *
+     * **既定の実装は [purchase] に委ねるだけ（乗り換えを指定しない）。** 既存の実装を壊さないための既定値。
+     */
+    suspend fun purchaseChangingPlan(
+        packageInfo: PackageInfo,
+        mode: PlanChangeMode = PlanChangeMode.CHARGE_PRORATED_PRICE,
+    ): PurchaseResult = purchase(Unit, packageInfo)
 
     /** リストアを実行する。 */
     suspend fun restore(): PurchaseResult

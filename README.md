@@ -134,6 +134,22 @@ val eligibility = client.checkTrialEligibility(packages)
 val showTrial = trial != null && eligibility[annual.productIdentifier] == TrialEligibility.ELIGIBLE
 ```
 
+### 段階のあるプラン（Entitlement が2つ以上）
+
+```kotlin
+// 設定した entitlementId 以外の Entitlement を確認する（確認に失敗したら null）
+val explain = client.checkEntitlementOrNull("explain")?.isActive
+
+// 値段の数（割引率の計算用）と、年額の「月あたり」の表示
+val annual = packages.first { it.identifier == "standard_annual" }
+val micros = annual.priceAmountMicros          // ¥4,000 → 4_000_000_000
+val perMonth = annual.pricePerMonthString      // 例: "¥333"
+
+// 上位のプランへ変える購入。Google Play で有効な購読が別の商品にあれば乗り換えとして買う
+// （明示しないと2つの購読が並んで両方に請求される）。App Store・購読なしならふつうの購入と同じ
+val result = client.purchaseChangingPlan(annual, PlanChangeMode.CHARGE_PRORATED_PRICE)
+```
+
 ### Paywall（カスタムUI）
 
 `paywall-logic` の `PaywallViewModel` を使い、UIだけ自前で実装:

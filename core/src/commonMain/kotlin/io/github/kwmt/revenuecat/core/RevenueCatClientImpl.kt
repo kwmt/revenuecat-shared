@@ -9,9 +9,11 @@ import com.revenuecat.purchases.kmp.ktx.awaitOfferings
 import com.revenuecat.purchases.kmp.ktx.awaitPurchase
 import com.revenuecat.purchases.kmp.ktx.awaitRestore
 import com.revenuecat.purchases.kmp.ktx.awaitTrialOrIntroPriceEligibility
+import com.revenuecat.purchases.kmp.models.GoogleReplacementMode
 import com.revenuecat.purchases.kmp.models.Package
 import com.revenuecat.purchases.kmp.models.PurchasesException
 import com.revenuecat.purchases.kmp.models.PurchasesTransactionException
+import com.revenuecat.purchases.kmp.models.Store
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -78,6 +80,19 @@ internal class RevenueCatClientImpl : RevenueCatClient {
         }
     }
 
+    override suspend fun checkEntitlementOrNull(entitlementId: String): EntitlementStatus? = try {
+        val entitlement = Purchases.sharedInstance.awaitCustomerInfo().entitlements[entitlementId]
+        EntitlementStatus(
+            isActive = entitlement?.isActive == true,
+            willRenew = entitlement?.willRenew == true,
+            expirationDateMillis = entitlement?.expirationDateMillis,
+        )
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: Exception) {
+        null
+    }
+
     // -------------------------------------------------------
     // Offerings
     // -------------------------------------------------------
@@ -135,6 +150,40 @@ internal class RevenueCatClientImpl : RevenueCatClient {
         } catch (e: Exception) {
             mapPurchaseException(e)
         }
+    }
+
+    override suspend fun purchaseChangingPlan(packageInfo: PackageInfo, mode: PlanChangeMode): PurchaseResult {
+        val pkg = packageInfo.rcPackage as Package
+        val entitlementId = requireConfig().entitlementId
+        return try {
+            val active = Purchases.sharedInstance.awaitCustomerInfo().entitlements[entitlementId]?.takeIf { it.isActive }
+            val oldProductId = playPlanChangeOldProductIdOf(
+                activeOnPlayStore = active?.store == Store.PLAY_STORE,
+                activeProductIdentifier = active?.productIdentifier,
+                activeProductPlanIdentifier = active?.productPlanIdentifier,
+                targetProductIdentifier = pkg.storeProduct.id,
+            ) ?: return purchase(Unit, packageInfo)
+            val result = Purchases.sharedInstance.awaitPurchase(
+                packageToPurchase = pkg,
+                oldProductId = oldProductId,
+                replacementMode = mode.toGoogleReplacementMode(),
+            )
+            val isActive = result.customerInfo.entitlements[entitlementId]?.isActive == true
+            _entitlementStatus.value = EntitlementStatus(isActive = isActive)
+            PurchaseResult.Success(isActive = isActive)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            mapPurchaseException(e)
+        }
+    }
+
+    private fun PlanChangeMode.toGoogleReplacementMode(): GoogleReplacementMode = when (this) {
+        PlanChangeMode.CHARGE_PRORATED_PRICE -> GoogleReplacementMode.CHARGE_PRORATED_PRICE
+        PlanChangeMode.CHARGE_FULL_PRICE -> GoogleReplacementMode.CHARGE_FULL_PRICE
+        PlanChangeMode.WITH_TIME_PRORATION -> GoogleReplacementMode.WITH_TIME_PRORATION
+        PlanChangeMode.WITHOUT_PRORATION -> GoogleReplacementMode.WITHOUT_PRORATION
+        PlanChangeMode.DEFERRED -> GoogleReplacementMode.DEFERRED
     }
 
     private fun mapPurchaseException(e: Exception): PurchaseResult = when {
