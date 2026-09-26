@@ -33,7 +33,39 @@ data class PackageInfo(
      * App Store Connect の「1週間」は `TrialPeriod(1, WEEK)` で届く（`7, DAY` ではない）。
      */
     val freeTrial: TrialPeriod? = null,
+    /**
+     * 値段の数（通貨の100万分の1の単位。¥500 なら 500_000_000）。取れなければ null。
+     *
+     * 表示用の [localizedPriceString] では計算できない（年額の割引率などを出すときに使う）。
+     */
+    val priceAmountMicros: Long? = null,
+    /**
+     * 1か月あたりの値段の表示（ストアの通貨の書き方のまま）。月額より長い期間の商品にだけ入る。取れなければ null。
+     */
+    val pricePerMonthString: String? = null,
 )
+
+/**
+ * Google Play で、有効な定期購入から別の商品へ乗り換えるときの切り替え方。RevenueCat SDK の `GoogleReplacementMode` と同じ名前。
+ *
+ * App Store は同じサブスクリプショングループの中なら Apple が乗り換えにするので、この指定は Google Play だけで効く。
+ */
+enum class PlanChangeMode {
+    /** すぐ切り替え、残りの期間の差額を請求する（上位のプランへの乗り換えだけに使える）。 */
+    CHARGE_PRORATED_PRICE,
+
+    /** すぐ切り替え、新しい商品の満額を請求する（残りの期間は新しい商品の期間に足す）。 */
+    CHARGE_FULL_PRICE,
+
+    /** すぐ切り替え、残りの期間を新しい商品の期間に換算する（請求は次の更新日から）。 */
+    WITH_TIME_PRORATION,
+
+    /** すぐ切り替え、次の更新日から新しい値段で請求する。 */
+    WITHOUT_PRORATION,
+
+    /** 今の期間が終わってから切り替える。 */
+    DEFERRED,
+}
 
 /** パッケージの期間の種類。RevenueCat SDK の `PackageType` と同じ並び。 */
 enum class PackageKind {

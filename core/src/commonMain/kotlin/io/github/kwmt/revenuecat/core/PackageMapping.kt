@@ -17,6 +17,8 @@ internal fun Package.toPackageInfo(): PackageInfo = PackageInfo(
     rcPackage = this,
     packageType = packageType.toPackageKind(),
     freeTrial = storeProduct.freeTrial(),
+    priceAmountMicros = storeProduct.price.amountMicros,
+    pricePerMonthString = storeProduct.pricePerMonth?.formatted,
 )
 
 internal fun PackageType.toPackageKind(): PackageKind = when (this) {
@@ -99,3 +101,27 @@ internal fun trialEligibilityOf(sdkAnswer: TrialEligibility?, googlePlayFreeTria
  * これでストアを見分ける。
  */
 internal fun StoreProduct.googlePlayFreeTrialOffered(): Boolean? = subscriptionOptions?.let { it.freeTrial != null }
+
+/**
+ * Google Play で乗り換えに渡す、乗り換え元の商品 ID（`商品:基本プラン` の形）。乗り換えが要らなければ null。
+ *
+ * - 乗り換え元が Google Play の購読でない（[activeOnPlayStore] が false）・乗り換え元が無い → null
+ * - 乗り換え先と同じ商品（基本プランだけ違う・年額と月額の切り替えも含む）→ null（ふつうの購入に任せる）
+ *
+ * RevenueCat は Google Play の購読を「商品」と「基本プラン」に分けて返すので、`:` でつなぐ。すでにつながっていればそのまま。
+ */
+internal fun playPlanChangeOldProductIdOf(
+    activeOnPlayStore: Boolean,
+    activeProductIdentifier: String?,
+    activeProductPlanIdentifier: String?,
+    targetProductIdentifier: String,
+): String? {
+    if (!activeOnPlayStore || activeProductIdentifier.isNullOrEmpty()) return null
+    val oldProductId = if (activeProductPlanIdentifier.isNullOrEmpty() || ':' in activeProductIdentifier) {
+        activeProductIdentifier
+    } else {
+        "$activeProductIdentifier:$activeProductPlanIdentifier"
+    }
+    if (oldProductId.substringBefore(':') == targetProductIdentifier.substringBefore(':')) return null
+    return oldProductId
+}
