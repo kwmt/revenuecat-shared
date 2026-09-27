@@ -51,6 +51,7 @@ See [Installation](docs/installation.md).
 
 ## Documentation
 
+- [Why not just use purchases-kmp?](docs/why.md) — what this adds on top of the official SDK
 - [Installation](docs/installation.md) — GitHub Packages, dependencies, iOS requirements
 - [Usage](docs/usage.md) — setup, entitlements, free trials, tiered plans, paywalls
 - [Release](docs/release.md) — how a new version is published

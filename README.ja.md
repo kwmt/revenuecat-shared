@@ -50,6 +50,7 @@ GitHub Packages で配布しているので、先に参照先と認証情報の�
 
 ## ドキュメント
 
+- [公式の purchases-kmp との違い](docs/ja/why.md) — 公式 SDK の上に何を足しているか
 - [導入](docs/ja/installation.md) — GitHub Packages・依存の追加・iOS の要件
 - [使い方](docs/ja/usage.md) — 初期化・Entitlement 確認・無料体験・段階のあるプラン・Paywall
 - [リリース](docs/ja/release.md) — 新しいバージョンの出し方
