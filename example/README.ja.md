@@ -1,5 +1,7 @@
 # Android Example App
 
+[English](README.md) | 日本語
+
 `core` + `paywall-logic` モジュールの使い方を示す Android サンプルアプリケーション（Jetpack Compose）。
 
 ## スクリーンショット
