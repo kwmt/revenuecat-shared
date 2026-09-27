@@ -2,46 +2,31 @@
 
 [English](../installation.md) | 日本語
 
-## 1. GitHub Packages を参照先に追加
+## 1. 参照先
 
-ライブラリは GitHub Packages で配布しています。各アプリの `settings.gradle.kts`:
+ライブラリは **Maven Central** で配布しています（0.0.10 以降）。参照先や認証情報を足す必要はありません。
+`mavenCentral()` が参照先に入っていることだけ確認してください（新しいプロジェクトなら最初から入っています）:
 
 ```kotlin
-import java.util.Properties
-
-val localProps = Properties().apply {
-    val file = rootProject.projectDir.resolve("local.properties")
-    if (file.exists()) load(file.inputStream())
-}
-
+// settings.gradle.kts
 dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        maven {
-            url = uri("https://maven.pkg.github.com/kwmt/revenuecat-shared")
-            credentials {
-                username = localProps.getProperty("gpr.user") ?: ""
-                password = localProps.getProperty("gpr.token") ?: ""
-            }
-        }
     }
 }
 ```
 
-`local.properties` に認証情報を追加:
-
-```properties
-gpr.user=YOUR_GITHUB_USERNAME
-gpr.token=YOUR_GITHUB_TOKEN  # read:packages 権限
-```
+> **0.0.9 以前から上げるとき:** 0.0.9 までは GitHub Packages だけで配布していました。
+> 0.0.10 以降に上げたら、`maven.pkg.github.com/kwmt/revenuecat-shared` の参照先と、`local.properties` の
+> `gpr.user` / `gpr.token` は消して構いません。
 
 ## 2. 依存を追加
 
 ```toml
 # 各アプリの libs.versions.toml
 [versions]
-revenuecat-shared = "0.0.9"
+revenuecat-shared = "0.0.10"
 
 [libraries]
 revenuecat-shared-core = { module = "io.github.kwmt.revenuecat:core", version.ref = "revenuecat-shared" }

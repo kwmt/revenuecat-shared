@@ -30,7 +30,7 @@ Entitlement の確認と購入ができます。
 ```kotlin
 // build.gradle.kts
 commonMain.dependencies {
-    implementation("io.github.kwmt.revenuecat:core:0.0.9")
+    implementation("io.github.kwmt.revenuecat:core:0.0.10")
 }
 ```
 
@@ -46,12 +46,12 @@ client.configure(
 if (client.checkEntitlement().isActive) { /* プレミアム機能を開放 */ }
 ```
 
-GitHub Packages で配布しているので、先に参照先と認証情報の設定が要ります。[導入](docs/ja/installation.md)を見てください。
+Maven Central で配布しています（0.0.10 以降）。ほかのモジュールと iOS の要件は[導入](docs/ja/installation.md)を見てください。
 
 ## ドキュメント
 
 - [公式の purchases-kmp との違い](docs/ja/why.md) — 公式 SDK の上に何を足しているか
-- [導入](docs/ja/installation.md) — GitHub Packages・依存の追加・iOS の要件
+- [導入](docs/ja/installation.md) — 依存の追加・iOS の要件
 - [使い方](docs/ja/usage.md) — 初期化・Entitlement 確認・無料体験・段階のあるプラン・Paywall
 - [リリース](docs/ja/release.md) — 新しいバージョンの出し方
 - サンプルアプリ: [Android](example/README.ja.md) / [iOS](example-ios/README.ja.md)
