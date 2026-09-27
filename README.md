@@ -30,7 +30,7 @@ Used in production by [Machilingual](https://machilingual.com), a Kotlin Multipl
 ```kotlin
 // build.gradle.kts
 commonMain.dependencies {
-    implementation("io.github.kwmt.revenuecat:core:0.0.9")
+    implementation("io.github.kwmt.revenuecat:core:0.0.10")
 }
 ```
 
@@ -46,13 +46,12 @@ client.configure(
 if (client.checkEntitlement().isActive) { /* unlock premium features */ }
 ```
 
-Packages are published to GitHub Packages, so you need to add the repository and credentials first.
-See [Installation](docs/installation.md).
+Published to Maven Central (0.0.10 and later). See [Installation](docs/installation.md) for the other modules and iOS requirements.
 
 ## Documentation
 
 - [Why not just use purchases-kmp?](docs/why.md) — what this adds on top of the official SDK
-- [Installation](docs/installation.md) — GitHub Packages, dependencies, iOS requirements
+- [Installation](docs/installation.md) — dependencies, iOS requirements
 - [Usage](docs/usage.md) — setup, entitlements, free trials, tiered plans, paywalls
 - [Release](docs/release.md) — how a new version is published
 - Example apps: [Android](example/README.md) / [iOS](example-ios/README.md)

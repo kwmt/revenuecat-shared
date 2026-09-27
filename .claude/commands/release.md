@@ -22,4 +22,4 @@
 - mainブランチ以外にいる場合は警告を出してユーザーに確認する
 - タグのフォーマットは `v` プレフィックス付き（例: `v0.2.0`）
 - PRがマージされると、GitHub Actions (`create-release-tag.yml`) がブランチ名からバージョンを抽出し、自動的にタグを作成・プッシュする
-- タグプッシュにより `publish.yml` が自動でトリガーされ、GitHub Packages publish & Release作成が行われる
+- タグプッシュにより `publish.yml` が自動でトリガーされ、Maven Central への publish と GitHub Release の作成が行われる

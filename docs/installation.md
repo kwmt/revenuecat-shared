@@ -2,46 +2,31 @@
 
 English | [日本語](ja/installation.md)
 
-## 1. Add GitHub Packages as a repository
+## 1. Repository
 
-The library is published to GitHub Packages. In each app's `settings.gradle.kts`:
+The library is published to **Maven Central** (0.0.10 and later), so no extra repository or credentials are needed.
+Make sure `mavenCentral()` is in your repositories (it is in new projects by default):
 
 ```kotlin
-import java.util.Properties
-
-val localProps = Properties().apply {
-    val file = rootProject.projectDir.resolve("local.properties")
-    if (file.exists()) load(file.inputStream())
-}
-
+// settings.gradle.kts
 dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        maven {
-            url = uri("https://maven.pkg.github.com/kwmt/revenuecat-shared")
-            credentials {
-                username = localProps.getProperty("gpr.user") ?: ""
-                password = localProps.getProperty("gpr.token") ?: ""
-            }
-        }
     }
 }
 ```
 
-Add your credentials to `local.properties`:
-
-```properties
-gpr.user=YOUR_GITHUB_USERNAME
-gpr.token=YOUR_GITHUB_TOKEN  # needs the read:packages scope
-```
+> **Upgrading from 0.0.9 or earlier:** those versions were published only to GitHub Packages.
+> After moving to 0.0.10 or later, you can remove the `maven.pkg.github.com/kwmt/revenuecat-shared` repository
+> and the `gpr.user` / `gpr.token` entries in `local.properties`.
 
 ## 2. Add the dependencies
 
 ```toml
 # libs.versions.toml
 [versions]
-revenuecat-shared = "0.0.9"
+revenuecat-shared = "0.0.10"
 
 [libraries]
 revenuecat-shared-core = { module = "io.github.kwmt.revenuecat:core", version.ref = "revenuecat-shared" }
