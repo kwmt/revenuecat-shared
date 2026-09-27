@@ -1,31 +1,19 @@
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.publish.PublishingExtension
-import org.gradle.kotlin.dsl.configure
-import java.net.URI
 
+/**
+ * Maven Central（Central Portal）に公開する設定。
+ *
+ * 公開先・署名・POM は `gradle.properties` の `mavenCentralPublishing` / `signAllPublications` / `POM_*` で決める
+ * （com.vanniktech.maven.publish がプロパティから読む）。プラグインの型を使わないのは、Gradle 8.13 の Kotlin DSL
+ * （Kotlin 2.0）が 0.37.0 のクラスを読めないため。
+ *
+ * 認証と署名は Gradle のプロパティ（CI では `ORG_GRADLE_PROJECT_` を付けた環境変数）で渡す:
+ * - `mavenCentralUsername` / `mavenCentralPassword`: Central Portal のユーザートークン
+ * - `signingInMemoryKey` / `signingInMemoryKeyPassword`: ASCII 形式の GPG 秘密鍵とそのパスワード
+ */
 class PublishingConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
-        with(target) {
-            pluginManager.apply("maven-publish")
-
-            group = project.property("GROUP") as String
-            version = project.property("VERSION_NAME") as String
-
-            afterEvaluate {
-                extensions.configure<PublishingExtension> {
-                    repositories {
-                        maven {
-                            name = "GitHubPackages"
-                            url = URI("https://maven.pkg.github.com/${System.getenv("GITHUB_REPOSITORY") ?: "kwmt/revenuecat-shared"}")
-                            credentials {
-                                username = System.getenv("GITHUB_ACTOR") ?: ""
-                                password = System.getenv("GITHUB_TOKEN") ?: ""
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        target.pluginManager.apply("com.vanniktech.maven.publish")
     }
 }
