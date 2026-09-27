@@ -71,7 +71,6 @@ Fake を差し込めます（`paywall-logic` の `PaywallViewModel` のテスト
 
 - このライブラリが包んでいない機能を使う（Customer Attributes・プロモーションオファー・RevenueCat Paywalls など）
 - アプリが1つだけで、共通化する必要がない
-- GitHub Packages の認証（`read:packages` のトークン）を用意したくない
 - `purchases-kmp` の新しいバージョンにすぐ上げたい（このライブラリは追従にタイムラグがあります）
 
 このライブラリと公式 SDK は同じアプリで併用できます。ただし `purchases-kmp` は `implementation` 依存なので、アプリから直接呼ぶときは同じバージョンの `purchases-kmp-core` をアプリの依存に足してください。

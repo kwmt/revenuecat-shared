@@ -71,7 +71,6 @@ This library is for when **you build the paywall UI in your app**, so the two se
 
 - You need features this library does not wrap (customer attributes, promotional offers, RevenueCat Paywalls, etc.)
 - You have only one app and nothing to share
-- You don't want to set up GitHub Packages credentials (a token with `read:packages`)
 - You want to adopt new `purchases-kmp` versions right away (this library follows them with some delay)
 
 You can use this library and the official SDK side by side in the same app. `purchases-kmp` is an `implementation` dependency, though, so to call it directly add `purchases-kmp-core` (the same version) to your app's dependencies.
