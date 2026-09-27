@@ -216,6 +216,10 @@ internal class RevenueCatClientImpl : RevenueCatClient {
     // ユーザー管理
     // -------------------------------------------------------
 
+    // ★configure の前に Purchases.sharedInstance を触ると SDK が例外を投げるので、先に null を返す
+    override fun appUserIdOrNull(): String? =
+        if (config == null) null else runCatching { Purchases.sharedInstance.appUserID }.getOrNull()
+
     override suspend fun login(appUserId: String) {
         Purchases.sharedInstance.awaitLogIn(appUserId)
         checkEntitlement()

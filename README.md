@@ -8,6 +8,7 @@ importing a platform SDK.
 - `checkEntitlementOrNull()` — returns `null` when the store could not be reached, so an app that
   persists membership never overwrites a paying user's state with "not subscribed" because of a network error
 - `checkEntitlementOrNull(entitlementId)` for apps with several entitlements (tiers)
+- `appUserIdOrNull()` — the RevenueCat app user ID, so your own server can verify the subscription with the RevenueCat REST API
 - `fetchCurrentOfferingPackages()` with prices (`priceAmountMicros`, `pricePerMonthString`)
 - `checkTrialEligibility()` on both platforms (on Android it is derived from the offers Google Play returns)
 - `purchase()` / `purchaseChangingPlan()` (Google Play plan-change modes for tier upgrades) / `restore()` / `login()` / `logout()`
