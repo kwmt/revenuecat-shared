@@ -94,6 +94,17 @@ interface RevenueCatClient {
     /** リストアを実行する。 */
     suspend fun restore(): PurchaseResult
 
+    /**
+     * RevenueCat がこの端末の利用者に付けている ID（[login] していなければ `$RCAnonymousID:` で始まる匿名 ID）。
+     * [configure] の前は null。
+     *
+     * サーバーから RevenueCat の REST API で購読を確かめるアプリが、リクエストに添えるために使う
+     * （端末の判定だけでは偽造を止められない、サーバーの原価がかかる機能を守るため）。
+     *
+     * **既定の実装は null を返す。** 既存の実装（テスト用の Fake など）を壊さないための既定値。
+     */
+    fun appUserIdOrNull(): String? = null
+
     /** ユーザー ID でログインする。 */
     suspend fun login(appUserId: String)
 
