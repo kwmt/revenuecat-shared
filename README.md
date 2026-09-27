@@ -1,5 +1,27 @@
 # revenuecat-shared
 
+A small Kotlin Multiplatform wrapper around the RevenueCat SDK, so that shared `commonMain` code
+(ViewModels, repositories) can check entitlements and make purchases on **Android and iOS** without
+importing a platform SDK.
+
+- `checkEntitlement()` / `entitlementStatus` (StateFlow) / `isPremium`
+- `checkEntitlementOrNull()` — returns `null` when the store could not be reached, so an app that
+  persists membership never overwrites a paying user's state with "not subscribed" because of a network error
+- `checkEntitlementOrNull(entitlementId)` for apps with several entitlements (tiers)
+- `fetchCurrentOfferingPackages()` with prices (`priceAmountMicros`, `pricePerMonthString`)
+- `checkTrialEligibility()` on both platforms (on Android it is derived from the offers Google Play returns)
+- `purchase()` / `purchaseChangingPlan()` (Google Play plan-change modes for tier upgrades) / `restore()` / `login()` / `logout()`
+- Optional `paywall-logic` (ViewModel + state) and `paywall-compose` (a default Compose Multiplatform paywall)
+
+Used in production by [Machilingual](https://machilingual.com), a Kotlin Multiplatform / Compose Multiplatform app on iOS and Android.
+The documentation below is in Japanese.
+
+## License
+
+[Apache License 2.0](LICENSE)
+
+---
+
 複数アプリで共通利用するRevenueCat KMPラッパーライブラリ。
 
 ## モジュール構成
