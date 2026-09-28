@@ -1,104 +1,106 @@
 # Android Example App
 
-`core` + `paywall-logic` モジュールの使い方を示す Android サンプルアプリケーション（Jetpack Compose）。
+English | [日本語](README.ja.md)
 
-## スクリーンショット
+An Android sample app (Jetpack Compose) that shows how to use the `core` and `paywall-logic` modules.
+
+## Screenshots
 
 | Home | Paywall | Settings |
 |:----:|:-------:|:--------:|
 | <img src="docs/screenshots/home.png" width="250"> | <img src="docs/screenshots/paywall.png" width="250"> | <img src="docs/screenshots/settings.png" width="250"> |
 
-## セットアップ
+## Setup
 
-### 1. RevenueCat ダッシュボードの設定
+### 1. Configure the RevenueCat dashboard
 
-サンプルアプリを動作させるには、RevenueCat 側の設定が必要です。
+The sample app needs some configuration on the RevenueCat side.
 
-#### 1-1. プロジェクト作成
+#### 1-1. Create a project
 
-1. [RevenueCat Dashboard](https://app.revenuecat.com) にログイン
-2. 「Create new project」でプロジェクトを作成
-3. 「Android app」を追加 → パッケージ名: `io.github.kwmt.revenuecat.example`
+1. Log in to the [RevenueCat Dashboard](https://app.revenuecat.com)
+2. Create a project with "Create new project"
+3. Add an "Android app" → package name: `io.github.kwmt.revenuecat.example`
 
-#### 1-2. Entitlements 設定
+#### 1-2. Entitlements
 
-1. Project Settings > Entitlements > 「New」
-2. Identifier: `premium` で作成（コード内の `entitlementId` と一致させる）
+1. Project Settings > Entitlements > "New"
+2. Create one with the identifier `premium` (it must match `entitlementId` in the code)
 
-#### 1-3. Products 登録
+#### 1-3. Products
 
-1. Project Settings > Products > 「New」
-2. Google Play Console で作成した定期購入の商品IDを登録
-3. 作成した Entitlement (`premium`) に紐付け
+1. Project Settings > Products > "New"
+2. Register the product ID of the subscription you created in the Google Play Console
+3. Attach it to the `premium` entitlement
 
-#### 1-4. Offerings 設定
+#### 1-4. Offerings
 
-1. Project Settings > Offerings > Default Offering を編集
-2. パッケージ（Monthly / Annual 等）を追加し、Products を紐付け
+1. Project Settings > Offerings > edit the Default Offering
+2. Add packages (Monthly / Annual, etc.) and attach the products
 
-#### 1-5. API キーの取得
+#### 1-5. Get the API key
 
 1. Project Settings > API Keys
-2. **Public Android API key** (`goog_xxx...`) をコピー
+2. Copy the **Public Android API key** (`goog_xxx...`)
 
-> **Google Play Service Credentials について**
-> Sandbox テストだけなら不要です。本番運用時は Google Cloud Console で Service Account を作成し、RevenueCat にアップロードしてください。
+> **About Google Play service credentials**
+> They are not needed for sandbox testing. For production, create a service account in the Google Cloud Console and upload it to RevenueCat.
 
-### 2. アプリ側の設定
+### 2. Configure the app
 
-1. `local.properties` に RevenueCat API キーを設定:
+1. Set the RevenueCat API key in `local.properties`:
 
 ```properties
 revenuecat.apiKey=goog_xxxxxxxxxxxxx
 ```
 
-2. ビルド:
+2. Build:
 
 ```bash
 ./gradlew :example:assembleDebug
 ```
 
-## Sandbox テスト（実際の課金なし）
+## Sandbox testing (no real charges)
 
-購入フローのテストは Google Play の Sandbox 環境で行えます。**実際の課金は発生しません。**
+You can test the purchase flow in Google Play's sandbox. **No real charges are made.**
 
-### テスターの追加
+### Add testers
 
-1. [Google Play Console](https://play.google.com/console) を開く
+1. Open the [Google Play Console](https://play.google.com/console)
 2. Settings > License Testing
-3. テストに使う Gmail アドレスを追加
-4. License type: `RESPOND_NORMALLY` を選択
+3. Add the Gmail addresses you test with
+4. Set License type to `RESPOND_NORMALLY`
 
-### テスト手順
+### Steps
 
-1. テスターとして追加した Google アカウントでデバイス/エミュレータにログイン
-2. アプリをインストールして起動
-3. Paywall 画面でパッケージを選択 → 「Subscribe」をタップ
-4. Google Play の購入ダイアログが表示される → **テストカード**で決済（課金なし）
-5. 購入完了後、Home 画面で「Premium: Active」になることを確認
+1. Sign in on the device/emulator with a Google account added as a tester
+2. Install and launch the app
+3. Pick a package on the Paywall screen → tap "Subscribe"
+4. Google Play's purchase dialog appears → pay with a **test card** (no charge)
+5. After the purchase, check that the Home screen shows "Premium: Active"
 
-### 注意点
+### Notes
 
-- エミュレータでテストする場合は **Google Play Store 搭載イメージ** (Google APIs + Play Store) を使用
-- License Testing に追加していないアカウントでは実際の課金が発生するので注意
-- RevenueCat ダッシュボードの「Sandbox data」トグルで Sandbox トランザクションを確認可能
+- On an emulator, use a **Google Play Store image** (Google APIs + Play Store)
+- Accounts not added to License Testing are charged for real
+- Use the "Sandbox data" toggle in the RevenueCat dashboard to see sandbox transactions
 
-### 定期購入のテスト期間
+### Subscription periods in testing
 
-Sandbox 環境では定期購入の更新サイクルが短縮されます：
+In the sandbox, subscription renewal periods are shortened:
 
-| 本番期間 | テスト期間 |
+| Production | Test |
 |----------|-----------|
-| 1週間 | 5分 |
-| 1ヶ月 | 5分 |
-| 3ヶ月 | 10分 |
-| 6ヶ月 | 15分 |
-| 1年 | 30分 |
+| 1 week | 5 minutes |
+| 1 month | 5 minutes |
+| 3 months | 10 minutes |
+| 6 months | 15 minutes |
+| 1 year | 30 minutes |
 
-## 画面構成
+## Screens
 
-| 画面 | 機能 | 使用API |
+| Screen | Features | API used |
 |------|------|---------|
-| Home | Entitlement Status 表示、Paywall 遷移 | `RevenueCatClient.entitlementStatus` |
-| Paywall | パッケージ一覧・選択・購入・リストア | `PaywallViewModel` |
-| Settings | User ID 入力、Login/Logout、Restore | `RevenueCatClient.login/logout/restore` |
+| Home | Shows the entitlement status, opens the Paywall | `RevenueCatClient.entitlementStatus` |
+| Paywall | Lists, selects, purchases, and restores packages | `PaywallViewModel` |
+| Settings | User ID input, Login/Logout, Restore | `RevenueCatClient.login/logout/restore` |

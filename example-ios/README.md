@@ -1,125 +1,127 @@
 # iOS Example App
 
-`core` + `paywall-logic` モジュールの使い方を示す iOS サンプルアプリケーション（SwiftUI）。
+English | [日本語](README.ja.md)
 
-## スクリーンショット
+An iOS sample app (SwiftUI) that shows how to use the `core` and `paywall-logic` modules.
+
+## Screenshots
 
 | Home | Paywall | Settings |
 |:----:|:-------:|:--------:|
 | <img src="docs/screenshots/home.png" width="250"> | <img src="docs/screenshots/paywall.png" width="250"> | <img src="docs/screenshots/settings.png" width="250"> |
 
-## セットアップ
+## Setup
 
-### 1. RevenueCat ダッシュボードの設定
+### 1. Configure the RevenueCat dashboard
 
-サンプルアプリを動作させるには、RevenueCat 側の設定が必要です。
+The sample app needs some configuration on the RevenueCat side.
 
-#### 1-1. プロジェクト作成
+#### 1-1. Create a project
 
-1. [RevenueCat Dashboard](https://app.revenuecat.com) にログイン
-2. 「Create new project」でプロジェクトを作成（Android と共有可能）
-3. 「iOS app」を追加 → Bundle ID: `io.github.kwmt.revenuecat.example-ios`
+1. Log in to the [RevenueCat Dashboard](https://app.revenuecat.com)
+2. Create a project with "Create new project" (it can be shared with Android)
+3. Add an "iOS app" → Bundle ID: `io.github.kwmt.revenuecat.example-ios`
 
-#### 1-2. Entitlements 設定
+#### 1-2. Entitlements
 
-1. Project Settings > Entitlements > 「New」
-2. Identifier: `premium` で作成（コード内の `entitlementId` と一致させる）
+1. Project Settings > Entitlements > "New"
+2. Create one with the identifier `premium` (it must match `entitlementId` in the code)
 
-#### 1-3. Products 登録
+#### 1-3. Products
 
-1. Project Settings > Products > 「New」
-2. App Store Connect で作成したサブスクリプションの Product ID を登録
-3. 作成した Entitlement (`premium`) に紐付け
+1. Project Settings > Products > "New"
+2. Register the product ID of the subscription you created in App Store Connect
+3. Attach it to the `premium` entitlement
 
-#### 1-4. Offerings 設定
+#### 1-4. Offerings
 
-1. Project Settings > Offerings > Default Offering を編集
-2. パッケージ（Monthly / Annual 等）を追加し、Products を紐付け
+1. Project Settings > Offerings > edit the Default Offering
+2. Add packages (Monthly / Annual, etc.) and attach the products
 
-#### 1-5. API キーの取得
+#### 1-5. Get the API key
 
 1. Project Settings > API Keys
-2. **Public iOS API key** (`appl_xxx...`) をコピー
+2. Copy the **Public iOS API key** (`appl_xxx...`)
 
-> **App Store Connect の設定について**
-> Sandbox テストだけなら App Store Connect Shared Secret の設定は不要です。本番運用時は App Store Connect API Key を RevenueCat にアップロードしてください。
+> **About App Store Connect settings**
+> The App Store Connect shared secret is not needed for sandbox testing. For production, upload an App Store Connect API key to RevenueCat.
 
-### 2. アプリ側の設定
+### 2. Configure the app
 
-1. KMP フレームワークをビルド:
+1. Build the KMP framework:
 
 ```bash
 ./gradlew :paywall-logic:linkDebugFrameworkIosSimulatorArm64
 ```
 
-2. `ExampleApp/Configuration.swift` に RevenueCat API キーを設定:
+2. Set the RevenueCat API key in `ExampleApp/Configuration.swift`:
 
 ```swift
 static let revenueCatAPIKey = "appl_xxxxxxxxxxxxx"
 ```
 
-3. `ExampleApp.xcodeproj` を Xcode で開いてビルド・実行（CocoaPods は使いません）
+3. Open `ExampleApp.xcodeproj` in Xcode, then build and run (CocoaPods is not used)
 
-## Sandbox テスト（実際の課金なし）
+## Sandbox testing (no real charges)
 
-購入フローのテストは Apple の Sandbox 環境で行えます。**実際の課金は発生しません。**
+You can test the purchase flow in Apple's sandbox. **No real charges are made.**
 
-### 方法 1: Xcode の StoreKit Testing（ローカル、推奨）
+### Option 1: StoreKit Testing in Xcode (local, recommended)
 
-App Store Connect でのプロダクト設定不要で、ローカルで即座にテストできます。
+You can test locally right away, with no product setup in App Store Connect.
 
-1. Xcode で File > New > File > StoreKit Configuration File を作成
-2. サブスクリプション商品を追加（Product ID は RevenueCat の Products と一致させる）
-3. Scheme > Edit Scheme > Run > Options > StoreKit Configuration で作成したファイルを選択
-4. シミュレータまたは実機で実行 → 購入ダイアログが表示される
+1. In Xcode, create a StoreKit Configuration File via File > New > File
+2. Add subscription products (product IDs must match the products in RevenueCat)
+3. In Scheme > Edit Scheme > Run > Options > StoreKit Configuration, select the file
+4. Run on a simulator or device → the purchase dialog appears
 
-### 方法 2: Sandbox テスターアカウント
+### Option 2: Sandbox tester account
 
-App Store Connect の Sandbox 環境を使ったテストです。
+Testing with the App Store Connect sandbox.
 
-#### テスターの作成
+#### Create a tester
 
-1. [App Store Connect](https://appstoreconnect.apple.com) を開く
+1. Open [App Store Connect](https://appstoreconnect.apple.com)
 2. Users and Access > Sandbox > Testers
-3. 「+」でテスターアカウントを作成（実在しないメールアドレスでOK）
+3. Create a tester account with "+" (a non-existent email address is fine)
 
-#### テスト手順
+#### Steps
 
-1. 実機の Settings > App Store > Sandbox Account でテスターアカウントにログイン
-2. アプリをインストールして起動
-3. Paywall 画面でパッケージを選択 → 「Subscribe」をタップ
-4. Sandbox の購入ダイアログが表示される → パスワードを入力（課金なし）
-5. 購入完了後、Home 画面で「Premium: Active」になることを確認
+1. On a device, sign in with the tester account in Settings > App Store > Sandbox Account
+2. Install and launch the app
+3. Pick a package on the Paywall screen → tap "Subscribe"
+4. The sandbox purchase dialog appears → enter the password (no charge)
+5. After the purchase, check that the Home screen shows "Premium: Active"
 
-### 注意点
+### Notes
 
-- **シミュレータ**: StoreKit Testing (方法 1) のみ使用可能。Sandbox アカウント方式は実機が必要
-- RevenueCat ダッシュボードの「Sandbox data」トグルで Sandbox トランザクションを確認可能
-- RevenueCat は自動的に Sandbox 環境を検知するため、特別な設定は不要
+- **Simulator**: only StoreKit Testing (option 1) works. Sandbox accounts require a real device
+- Use the "Sandbox data" toggle in the RevenueCat dashboard to see sandbox transactions
+- RevenueCat detects the sandbox environment automatically; no extra configuration is needed
 
-### 定期購入のテスト期間
+### Subscription periods in testing
 
-Sandbox 環境では定期購入の更新サイクルが短縮されます：
+In the sandbox, subscription renewal periods are shortened:
 
-| 本番期間 | テスト期間 |
+| Production | Test |
 |----------|-----------|
-| 1週間 | 3分 |
-| 1ヶ月 | 5分 |
-| 2ヶ月 | 10分 |
-| 3ヶ月 | 15分 |
-| 6ヶ月 | 30分 |
-| 1年 | 1時間 |
+| 1 week | 3 minutes |
+| 1 month | 5 minutes |
+| 2 months | 10 minutes |
+| 3 months | 15 minutes |
+| 6 months | 30 minutes |
+| 1 year | 1 hour |
 
-## 画面構成
+## Screens
 
-| 画面 | 機能 | 使用API |
+| Screen | Features | API used |
 |------|------|---------|
-| Home | Entitlement Status 表示、Check Entitlement | `RevenueCatClient.entitlementStatus` |
-| Paywall | パッケージ一覧・選択・購入・リストア | `PaywallViewModel` |
-| Settings | User ID 入力、Login/Logout、Restore | `RevenueCatClient.login/logout/restore` |
+| Home | Shows the entitlement status, Check Entitlement | `RevenueCatClient.entitlementStatus` |
+| Paywall | Lists, selects, purchases, and restores packages | `PaywallViewModel` |
+| Settings | User ID input, Login/Logout, Restore | `RevenueCatClient.login/logout/restore` |
 
-## 技術的な補足
+## Technical notes
 
-- KMP StateFlow の監視には `FlowHelper` 経由のコールバックパターンを使用（SKIE 不要）
-- RevenueCat iOS SDK は `purchases-kmp` 3.x が Kotlin のフレームワークに同梱する（0.0.8 から。`PurchasesHybridCommon` を足すと SDK が二重に入る）
-- `paywall-logic` フレームワークが `export(project(":core"))` で core API も公開
+- KMP StateFlows are observed with a callback pattern via `FlowHelper` (no SKIE needed)
+- The RevenueCat iOS SDK is bundled into the Kotlin framework by `purchases-kmp` 3.x (since 0.0.8; adding `PurchasesHybridCommon` links the SDK twice)
+- The `paywall-logic` framework also exposes the core API via `export(project(":core"))`
